@@ -1,3 +1,4 @@
+/** The various tags that are placed on entity transactions for querying functionality. */
 export enum EntityTag {
   UnixTime = "Unix-Time",
 
@@ -16,6 +17,7 @@ export enum EntityTag {
   CipherIV = "Cipher-IV",
 }
 
+/** The valid values for the `Entity-Type` tag on all entity transactions. */
 export enum EntityType {
   Drive = "drive",
   Folder = "folder",

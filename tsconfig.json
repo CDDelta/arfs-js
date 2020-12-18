@@ -1,9 +1,11 @@
 {
     "compilerOptions": {
       "module": "commonjs",
-      "target": "es2015",
+      "target": "es2017",
       "declaration": true,
       "strictNullChecks": true,
+      "experimentalDecorators": true,
+      "esModuleInterop": true,
       "outDir": "./dist"
     },
     "include": [
