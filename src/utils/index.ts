@@ -1,4 +1,6 @@
-import { EntityTag } from '../entities/enums';
+import Arweave from 'arweave';
+import { ContentType, Entity, EntityTag } from '../entities';
+import { classToPlain } from 'class-transformer';
 
 /** Temporary Arweave transaction mock */
 export interface Transaction {
@@ -20,4 +22,23 @@ export function addTagsToTx(tx: Transaction, tags: EntityTagMap) {
       tx.addTag(key, value);
     }
   }
+}
+
+/**
+ * Creates a transaction with the provided entity's data unencrypted and encoded as JSON,
+ * including the appropriate `Content-Type` tag.
+ */
+export async function createUnencryptedEntityDataTransaction(
+  entity: Entity,
+  arweave: Arweave,
+): Promise<Transaction> {
+  const tx = await arweave.createTransaction({
+    data: JSON.stringify(classToPlain(entity)),
+  });
+
+  addTagsToTx(tx, {
+    'Content-Type': ContentType.Json,
+  });
+
+  return tx;
 }

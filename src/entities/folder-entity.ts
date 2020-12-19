@@ -1,9 +1,16 @@
-import { Exclude, classToPlain } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
 import Arweave from 'arweave';
-import { Transaction, addTagsToTx, EntityTagMap } from '../utils';
+import {
+  Transaction,
+  addTagsToTx,
+  EntityTagMap,
+  createUnencryptedEntityDataTransaction,
+} from '../utils';
 import { Entity } from './entity';
-import { EntityType } from './enums';
+import { EntityType, Cipher } from './enums';
+import { createEncryptedEntityTransaction } from '../crypto';
+import { TransactionInterface } from 'arweave/node/lib/transaction';
 
 export class FolderEntity
   extends Entity
@@ -45,11 +52,17 @@ export class FolderEntity
 
   async asTransaction(
     arweave: Arweave,
-    encryptionKey: CryptoKey,
+    txAttributes: Partial<TransactionInterface>,
+    cipher: Cipher | null = null,
+    driveKey: CryptoKey | null = null,
   ): Promise<Transaction> {
-    const tx = await arweave.createTransaction({
-      data: JSON.stringify(classToPlain(this)),
-    });
+    const tx =
+      cipher && driveKey
+        ? await createEncryptedEntityTransaction(this, arweave, txAttributes, {
+            name: cipher,
+            key: driveKey,
+          })
+        : await createUnencryptedEntityDataTransaction(this, arweave);
 
     const tags: EntityTagMap = {
       'Entity-Type': EntityType.Folder,

@@ -1,9 +1,15 @@
-import { Exclude, classToPlain } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import { IsDate, IsNotEmpty, IsNumber } from 'class-validator';
 import { Entity } from './entity';
 import Arweave from 'arweave';
-import { addTagsToTx, Transaction } from '../utils';
-import { EntityType } from './enums';
+import {
+  addTagsToTx,
+  Transaction,
+  createUnencryptedEntityDataTransaction,
+} from '../utils';
+import { Cipher, EntityType } from './enums';
+import { createEncryptedEntityTransaction } from '../crypto';
+import { TransactionInterface } from 'arweave/node/lib/transaction';
 
 export class FileEntity extends Entity implements FileEntityTransactionData {
   /**
@@ -62,11 +68,17 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
 
   async asTransaction(
     arweave: Arweave,
-    encryptionKey: CryptoKey,
+    txAttributes: Partial<TransactionInterface>,
+    cipher: Cipher | null = null,
+    fileKey: CryptoKey | null = null,
   ): Promise<Transaction> {
-    const tx = await arweave.createTransaction({
-      data: JSON.stringify(classToPlain(this)),
-    });
+    const tx =
+      cipher && fileKey
+        ? await createEncryptedEntityTransaction(this, arweave, txAttributes, {
+            name: cipher,
+            key: fileKey,
+          })
+        : await createUnencryptedEntityDataTransaction(this, arweave);
 
     addTagsToTx(tx, {
       'Entity-Type': EntityType.File,

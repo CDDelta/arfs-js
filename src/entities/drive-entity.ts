@@ -1,9 +1,15 @@
 import Arweave from 'arweave';
-import { classToPlain, Exclude } from 'class-transformer';
+import { TransactionInterface } from 'arweave/node/lib/transaction';
+import { Exclude } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { addTagsToTx, Transaction } from '../utils';
+import { createEncryptedEntityTransaction } from '../crypto';
+import {
+  addTagsToTx,
+  createUnencryptedEntityDataTransaction,
+  Transaction,
+} from '../utils';
 import { Entity } from './entity';
-import { DriveAuthMode, DrivePrivacy, EntityType } from './enums';
+import { Cipher, DriveAuthMode, DrivePrivacy, EntityType } from './enums';
 
 export class DriveEntity extends Entity implements DriveEntityTransactionData {
   @IsString()
@@ -30,11 +36,17 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
 
   async asTransaction(
     arweave: Arweave,
-    encryptionKey: CryptoKey,
+    txAttributes: Partial<TransactionInterface>,
+    cipher: Cipher | null = null,
+    driveKey: CryptoKey | null = null,
   ): Promise<Transaction> {
-    const tx = await arweave.createTransaction({
-      data: JSON.stringify(classToPlain(this)),
-    });
+    const tx =
+      cipher && driveKey
+        ? await createEncryptedEntityTransaction(this, arweave, txAttributes, {
+            name: cipher,
+            key: driveKey,
+          })
+        : await createUnencryptedEntityDataTransaction(this, arweave);
 
     addTagsToTx(tx, {
       'Entity-Type': EntityType.Drive,

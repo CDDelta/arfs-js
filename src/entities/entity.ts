@@ -1,6 +1,8 @@
 import { Exclude } from 'class-transformer';
 import { Transaction } from '../utils';
 import Arweave from 'arweave';
+import { Cipher } from './enums';
+import { TransactionInterface } from 'arweave/node/lib/transaction';
 
 export abstract class Entity {
   /** The id of the transaction that represents this entity. */
@@ -19,8 +21,15 @@ export abstract class Entity {
   @Exclude()
   transactionTimestamp: Date;
 
+  /**
+   * Converts this entity into a transaction that can be submitted to Arweave.
+   *
+   * Optionally specify a cipher and encryption key to encrypt this entity's data.
+   */
   abstract asTransaction(
     arweave: Arweave,
-    encryptionKey: CryptoKey,
+    txAttributes: Partial<TransactionInterface>,
+    cipher: Cipher | null,
+    encryptionKey: CryptoKey | null,
   ): Promise<Transaction>;
 }
