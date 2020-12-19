@@ -1,16 +1,16 @@
 import { Exclude } from 'class-transformer';
 import { Transaction } from '../utils';
 import Arweave from 'arweave';
-import { Cipher, EntityTag } from './enums';
+import { Cipher } from './enums';
 import { TransactionInterface } from 'arweave/node/lib/transaction';
 
 export abstract class Entity {
   /** The id of the transaction that represents this entity. */
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   transactionId: string;
 
   /** The address of the transaction owner that represents this entity. */
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   transactionOwnerAddress: string;
 
   /**
@@ -18,7 +18,7 @@ export abstract class Entity {
    *
    * Extracted from the `Unix-Time` tag on the entity.
    */
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   transactionTimestamp: Date;
 
   /**

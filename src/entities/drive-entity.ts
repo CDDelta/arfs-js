@@ -4,6 +4,7 @@ import { Exclude, plainToClass } from 'class-transformer';
 import {
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   validateOrReject,
 } from 'class-validator';
@@ -39,9 +40,10 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
   @Exclude({ toPlainOnly: true })
   privacy: DrivePrivacy;
 
+  @IsOptional()
   @IsEnum(DriveAuthMode)
   @Exclude({ toPlainOnly: true })
-  authMode: DriveAuthMode;
+  authMode: DriveAuthMode | undefined;
 
   @IsString()
   @IsNotEmpty()
