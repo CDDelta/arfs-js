@@ -1,15 +1,21 @@
-import { Exclude } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { Exclude, plainToClass } from 'class-transformer';
+import { IsNotEmpty, IsString, validateOrReject } from 'class-validator';
 import Arweave from 'arweave';
 import {
   Transaction,
   addTagsToTx,
   EntityTagMap,
   createUnencryptedEntityDataTransaction,
+  addArFSTagToTx,
+  addUnixTimestampTagToTx,
+  parseUnixTimeTagToDate,
 } from '../utils';
 import { Entity } from './entity';
-import { EntityType, Cipher } from './enums';
-import { createEncryptedEntityTransaction } from '../crypto';
+import { EntityType, Cipher, EntityTag } from './enums';
+import {
+  createEncryptedEntityTransaction,
+  decryptEntityTransactionData,
+} from '../crypto';
 import { TransactionInterface } from 'arweave/node/lib/transaction';
 
 export class FolderEntity
@@ -50,6 +56,41 @@ export class FolderEntity
   @IsNotEmpty()
   name: string;
 
+  /**
+   * Decodes the provided parameters into a folder entity class.
+   *
+   * Throws an error if the provided parameters form an invalid folder entity.
+   */
+  static async fromTransaction(
+    txId: string,
+    txOwnerAddress: string,
+    txTags: EntityTagMap,
+    txData: string | ArrayBuffer,
+    driveKey: CryptoKey | null = null,
+  ): Promise<FolderEntity> {
+    const entityTxData = driveKey
+      ? await decryptEntityTransactionData<FolderEntityTransactionData>(
+          txData as ArrayBuffer,
+          txTags,
+          driveKey,
+        )
+      : JSON.parse(txData as string);
+
+    const entity = plainToClass(FolderEntity, {
+      ...entityTxData,
+      transactionId: txId,
+      transactionOwnerAddress: txOwnerAddress,
+      transactionTimestamp: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
+      id: txTags[EntityTag.FolderId],
+      driveId: txTags[EntityTag.DriveId],
+      parentFolderId: txTags[EntityTag.ParentFolderId],
+    });
+
+    await validateOrReject(entity);
+
+    return entity;
+  }
+
   async asTransaction(
     arweave: Arweave,
     txAttributes: Partial<TransactionInterface>,
@@ -63,6 +104,9 @@ export class FolderEntity
             key: driveKey,
           })
         : await createUnencryptedEntityDataTransaction(this, arweave);
+
+    addArFSTagToTx(tx);
+    addUnixTimestampTagToTx(tx);
 
     const tags: EntityTagMap = {
       'Entity-Type': EntityType.Folder,

@@ -1,14 +1,26 @@
-import { Exclude } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsNumber } from 'class-validator';
+import { Exclude, plainToClass } from 'class-transformer';
+import {
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  validateOrReject,
+} from 'class-validator';
 import { Entity } from './entity';
 import Arweave from 'arweave';
 import {
   addTagsToTx,
   Transaction,
   createUnencryptedEntityDataTransaction,
+  EntityTagMap,
+  addArFSTagToTx,
+  addUnixTimestampTagToTx,
+  parseUnixTimeTagToDate,
 } from '../utils';
-import { Cipher, EntityType } from './enums';
-import { createEncryptedEntityTransaction } from '../crypto';
+import { Cipher, EntityTag, EntityType } from './enums';
+import {
+  createEncryptedEntityTransaction,
+  decryptEntityTransactionData,
+} from '../crypto';
 import { TransactionInterface } from 'arweave/node/lib/transaction';
 
 export class FileEntity extends Entity implements FileEntityTransactionData {
@@ -66,6 +78,41 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
   @IsNotEmpty()
   dataContentType: string;
 
+  /**
+   * Decodes the provided parameters into a file entity class.
+   *
+   * Throws an error if the provided parameters form an invalid file entity.
+   */
+  static async fromTransaction(
+    txId: string,
+    txOwnerAddress: string,
+    txTags: EntityTagMap,
+    txData: string | ArrayBuffer,
+    driveKey: CryptoKey | null = null,
+  ): Promise<FileEntity> {
+    const entityTxData = driveKey
+      ? await decryptEntityTransactionData<FileEntityTransactionData>(
+          txData as ArrayBuffer,
+          txTags,
+          driveKey,
+        )
+      : JSON.parse(txData as string);
+
+    const entity = plainToClass(FileEntity, {
+      ...entityTxData,
+      transactionId: txId,
+      transactionOwnerAddress: txOwnerAddress,
+      transactionTimestamp: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
+      id: txTags[EntityTag.FileId],
+      driveId: txTags[EntityTag.DriveId],
+      parentFolderId: txTags[EntityTag.ParentFolderId],
+    });
+
+    await validateOrReject(entity);
+
+    return entity;
+  }
+
   async asTransaction(
     arweave: Arweave,
     txAttributes: Partial<TransactionInterface>,
@@ -79,6 +126,9 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
             key: fileKey,
           })
         : await createUnencryptedEntityDataTransaction(this, arweave);
+
+    addArFSTagToTx(tx);
+    addUnixTimestampTagToTx(tx);
 
     addTagsToTx(tx, {
       'Entity-Type': EntityType.File,

@@ -1,15 +1,33 @@
 import Arweave from 'arweave';
 import { TransactionInterface } from 'arweave/node/lib/transaction';
-import { Exclude } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { createEncryptedEntityTransaction } from '../crypto';
+import { Exclude, plainToClass } from 'class-transformer';
 import {
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  validateOrReject,
+} from 'class-validator';
+import {
+  createEncryptedEntityTransaction,
+  decryptEntityTransactionData,
+} from '../crypto';
+import {
+  addArFSTagToTx,
   addTagsToTx,
+  addUnixTimestampTagToTx,
   createUnencryptedEntityDataTransaction,
+  EntityTagMap,
+  parseUnixTimeTagToDate,
   Transaction,
 } from '../utils';
 import { Entity } from './entity';
-import { Cipher, DriveAuthMode, DrivePrivacy, EntityType } from './enums';
+import {
+  Cipher,
+  DriveAuthMode,
+  DrivePrivacy,
+  EntityTag,
+  EntityType,
+} from './enums';
 
 export class DriveEntity extends Entity implements DriveEntityTransactionData {
   @IsString()
@@ -34,6 +52,41 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
   @IsNotEmpty()
   rootFolderId: string;
 
+  /**
+   * Decodes the provided parameters into a drive entity class.
+   *
+   * Throws an error if the provided parameters form an invalid drive entity.
+   */
+  static async fromTransaction(
+    txId: string,
+    txOwnerAddress: string,
+    txTags: EntityTagMap,
+    txData: string | ArrayBuffer,
+    driveKey: CryptoKey | null = null,
+  ): Promise<DriveEntity> {
+    const entityTxData = driveKey
+      ? await decryptEntityTransactionData<DriveEntityTransactionData>(
+          txData as ArrayBuffer,
+          txTags,
+          driveKey,
+        )
+      : JSON.parse(txData as string);
+
+    const entity = plainToClass(DriveEntity, {
+      ...entityTxData,
+      transactionId: txId,
+      transactionOwnerAddress: txOwnerAddress,
+      transactionTimestamp: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
+      id: txTags[EntityTag.DriveId],
+      privacy: txTags[EntityTag.DrivePrivacy],
+      authMode: txTags[EntityTag.DriveAuthMode],
+    });
+
+    await validateOrReject(entity);
+
+    return entity;
+  }
+
   async asTransaction(
     arweave: Arweave,
     txAttributes: Partial<TransactionInterface>,
@@ -47,6 +100,9 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
             key: driveKey,
           })
         : await createUnencryptedEntityDataTransaction(this, arweave);
+
+    addArFSTagToTx(tx);
+    addUnixTimestampTagToTx(tx);
 
     addTagsToTx(tx, {
       'Entity-Type': EntityType.Drive,
