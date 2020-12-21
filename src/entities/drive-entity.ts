@@ -95,6 +95,8 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
    * Decodes the provided parameters into a drive entity class.
    *
    * Throws an error if the provided parameters form an invalid drive entity.
+   *
+   * @param txData expected to be of type `string` if the entity is unencrypted, `ArrayBuffer` if the entity is encrypted.
    */
   static async fromTransaction(
     txId: string,

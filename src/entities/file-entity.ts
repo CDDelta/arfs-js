@@ -116,6 +116,8 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
    * Decodes the provided parameters into a file entity class.
    *
    * Throws an error if the provided parameters form an invalid file entity.
+   *
+   * @param txData expected to be of type `string` if the entity is unencrypted, `ArrayBuffer` if the entity is encrypted.
    */
   static async fromTransaction(
     txId: string,
