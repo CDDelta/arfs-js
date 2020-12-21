@@ -1,5 +1,10 @@
 import { Exclude, plainToClass } from 'class-transformer';
-import { IsNotEmpty, IsString, validateOrReject } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  validateOrReject,
+} from 'class-validator';
 import Arweave from 'arweave';
 import {
   Transaction,
@@ -28,6 +33,7 @@ export class FolderEntity
    */
   @IsString()
   @IsNotEmpty()
+  @IsUUID()
   @Exclude({ toPlainOnly: true })
   id: string;
 

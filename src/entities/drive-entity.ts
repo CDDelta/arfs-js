@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   validateOrReject,
 } from 'class-validator';
 import {
@@ -31,15 +32,32 @@ import {
 } from './enums';
 
 export class DriveEntity extends Entity implements DriveEntityTransactionData {
+  /**
+   * The unique, persistent id of this drive.
+   *
+   * Extracted from the drive entity transaction's `Drive-Id` tag.
+   */
   @IsString()
   @IsNotEmpty()
+  @IsUUID()
   @Exclude({ toPlainOnly: true })
   id: string;
 
+  /**
+   * Whether or not this drive is public or private.
+   *
+   * Extracted from the drive entity transaction's `Drive-Privacy` tag.
+   */
   @IsEnum(DrivePrivacy)
   @Exclude({ toPlainOnly: true })
   privacy: DrivePrivacy;
 
+  /**
+   * The mode of authentication for this drive. `undefined` if the drive
+   * is public.
+   *
+   * Extracted from the drive entity transaction's `Drive-Auth-Mode` tag.
+   */
   @IsOptional()
   @IsEnum(DriveAuthMode)
   @Exclude({ toPlainOnly: true })

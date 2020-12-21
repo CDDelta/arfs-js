@@ -3,6 +3,9 @@ import {
   IsDate,
   IsNotEmpty,
   IsNumber,
+  IsPositive,
+  IsString,
+  IsUUID,
   validateOrReject,
 } from 'class-validator';
 import { Entity } from './entity';
@@ -29,7 +32,9 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
    *
    * Extracted from the file entity transaction's `File-Id` tag.
    */
+  @IsString()
   @IsNotEmpty()
+  @IsUUID()
   @Exclude({ toPlainOnly: true })
   id: string;
 
@@ -38,6 +43,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
    *
    * Extracted from the file entity transaction's `Drive-Id` tag.
    */
+  @IsString()
   @IsNotEmpty()
   @Exclude({ toPlainOnly: true })
   driveId: string;
@@ -48,15 +54,18 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
    * Never `null` as files should always have a parent.
    * Files at the root folder of a drive should assign the root folder as their parent.
    */
+  @IsString()
   @IsNotEmpty()
   @Exclude({ toPlainOnly: true })
   parentFolderId: string;
 
+  @IsString()
   @IsNotEmpty()
   name: string;
 
   /** The original size of the file before any encoding in bytes. */
   @IsNumber()
+  @IsPositive()
   size: number;
 
   @IsDate()
@@ -67,6 +76,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
    *
    * This can refer to a top-level transaction or data item created using ANS-102.
    */
+  @IsString()
   @IsNotEmpty()
   dataTxId: string;
 
@@ -75,6 +85,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
    *
    * Should be the same as the `Content-Type` tag on the data transaction.
    */
+  @IsString()
   @IsNotEmpty()
   dataContentType: string;
 
