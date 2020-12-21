@@ -72,6 +72,25 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
   @IsNotEmpty()
   rootFolderId: string;
 
+  constructor(properties: Omit<DriveEntity, keyof Entity>, validate = true) {
+    super();
+
+    // Workaround for class-transformer using the constructor.
+    if (!properties) {
+      return;
+    }
+
+    this.id = properties.id;
+    this.privacy = properties.privacy;
+    this.authMode = properties.authMode;
+    this.name = properties.name;
+    this.rootFolderId = properties.rootFolderId;
+
+    if (validate) {
+      validateOrReject(this);
+    }
+  }
+
   /**
    * Decodes the provided parameters into a drive entity class.
    *
@@ -128,8 +147,13 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
       'Entity-Type': EntityType.Drive,
       'Drive-Id': this.id,
       'Drive-Privacy': this.privacy,
-      'Drive-Auth-Mode': this.authMode,
     });
+
+    if (this.authMode) {
+      addTagsToTx(tx, {
+        'Drive-Auth-Mode': this.authMode,
+      });
+    }
 
     return tx;
   }

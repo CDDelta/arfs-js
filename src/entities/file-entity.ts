@@ -6,6 +6,7 @@ import {
   IsPositive,
   IsString,
   IsUUID,
+  validate,
   validateOrReject,
 } from 'class-validator';
 import { Entity } from './entity';
@@ -88,6 +89,28 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
   @IsString()
   @IsNotEmpty()
   dataContentType: string;
+
+  constructor(properties: Omit<FileEntity, keyof Entity>, validate = true) {
+    super();
+
+    // Workaround for class-transformer using the constructor.
+    if (!properties) {
+      return;
+    }
+
+    this.id = properties.id;
+    this.driveId = properties.driveId;
+    this.parentFolderId = properties.parentFolderId;
+    this.name = properties.name;
+    this.size = properties.size;
+    this.lastModifiedDate = properties.lastModifiedDate;
+    this.dataTxId = properties.dataTxId;
+    this.dataContentType = properties.dataContentType;
+
+    if (validate) {
+      validateOrReject(this);
+    }
+  }
 
   /**
    * Decodes the provided parameters into a file entity class.

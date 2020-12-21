@@ -62,6 +62,24 @@ export class FolderEntity
   @IsNotEmpty()
   name: string;
 
+  constructor(properties: Omit<FolderEntity, keyof Entity>, validate = true) {
+    super();
+
+    // Workaround for class-transformer using the constructor.
+    if (!properties) {
+      return;
+    }
+
+    this.id = properties.id;
+    this.driveId = properties.driveId;
+    this.parentFolderId = properties.parentFolderId;
+    this.name = properties.name;
+
+    if (validate) {
+      validateOrReject(this);
+    }
+  }
+
   /**
    * Decodes the provided parameters into a folder entity class.
    *
