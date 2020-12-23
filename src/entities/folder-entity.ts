@@ -62,7 +62,10 @@ export class FolderEntity
   @IsNotEmpty()
   name: string;
 
-  constructor(properties: Omit<FolderEntity, keyof Entity>, validate = true) {
+  constructor(
+    properties: Omit<FolderEntity, keyof Omit<Entity, 'createdAt'>>,
+    validate = true,
+  ) {
     super();
 
     // Workaround for class-transformer using the constructor.
@@ -74,6 +77,7 @@ export class FolderEntity
     this.driveId = properties.driveId;
     this.parentFolderId = properties.parentFolderId;
     this.name = properties.name;
+    this.createdAt = properties.createdAt;
 
     if (validate) {
       validateOrReject(this);

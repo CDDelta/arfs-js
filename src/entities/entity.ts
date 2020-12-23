@@ -14,12 +14,12 @@ export abstract class Entity {
   transactionOwnerAddress: string;
 
   /**
-   * The timestamp at which this entity transaction was created.
+   * The time at which this entity was created.
    *
    * Extracted from the `Unix-Time` tag on the entity.
    */
   @Exclude({ toPlainOnly: true })
-  transactionTimestamp: Date;
+  createdAt: Date;
 
   /**
    * Converts this entity into a transaction that can be submitted to Arweave.

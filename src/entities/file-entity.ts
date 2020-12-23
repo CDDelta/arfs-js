@@ -90,7 +90,10 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
   @IsNotEmpty()
   dataContentType: string;
 
-  constructor(properties: Omit<FileEntity, keyof Entity>, validate = true) {
+  constructor(
+    properties: Omit<FileEntity, keyof Omit<Entity, 'createdAt'>>,
+    validate = true,
+  ) {
     super();
 
     // Workaround for class-transformer using the constructor.
@@ -106,6 +109,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
     this.lastModifiedDate = properties.lastModifiedDate;
     this.dataTxId = properties.dataTxId;
     this.dataContentType = properties.dataContentType;
+    this.createdAt = properties.createdAt;
 
     if (validate) {
       validateOrReject(this);

@@ -72,7 +72,10 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
   @IsNotEmpty()
   rootFolderId: string;
 
-  constructor(properties: Omit<DriveEntity, keyof Entity>, validate = true) {
+  constructor(
+    properties: Omit<DriveEntity, keyof Omit<Entity, 'createdAt'>>,
+    validate = true,
+  ) {
     super();
 
     // Workaround for class-transformer using the constructor.
@@ -85,6 +88,7 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
     this.authMode = properties.authMode;
     this.name = properties.name;
     this.rootFolderId = properties.rootFolderId;
+    this.createdAt = properties.createdAt;
 
     if (validate) {
       validateOrReject(this);
