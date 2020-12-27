@@ -1,23 +1,23 @@
-import { DriveEntity } from '../../src';
+import { FolderEntity } from '../../src';
 import { getArweaveClient, tagListToMap } from '../utils';
 
 const arweave = getArweaveClient();
 
-describe('DriveEntity', () => {
+describe('FolderEntity', () => {
   describe('fromTransaction()', () => {
     test('can decode into class', async () => {
       const tx = await arweave.transactions.get(
-        '0r8phv2OZDCNO69qQ6QO3jVJYoYPL2en_vUoWjxXz20',
+        'EQ3oBdPXe3LNaAdDkaeR11MGPD05S3AtNxpoxLJ1XeM',
       );
 
       await expect(
-        DriveEntity.fromTransaction(
+        FolderEntity.fromTransaction(
           tx.id,
           await arweave.wallets.ownerToAddress(tx.owner),
           tagListToMap(tx.tags),
           tx.data,
         ),
-      ).resolves.toBeInstanceOf(DriveEntity);
+      ).resolves.toBeInstanceOf(FolderEntity);
     });
   });
 });
