@@ -122,7 +122,7 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
       ...entityTxData,
       transactionId: txId,
       transactionOwnerAddress: txOwnerAddress,
-      transactionTimestamp: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
+      createdAt: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
       id: txTags[EntityTag.DriveId],
       privacy: txTags[EntityTag.DrivePrivacy],
       authMode: txTags[EntityTag.DriveAuthMode],

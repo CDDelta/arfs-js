@@ -144,7 +144,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
       ...entityTxData,
       transactionId: txId,
       transactionOwnerAddress: txOwnerAddress,
-      transactionTimestamp: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
+      createdAt: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
       id: txTags[EntityTag.FileId],
       driveId: txTags[EntityTag.DriveId],
       parentFolderId: txTags[EntityTag.ParentFolderId],
