@@ -17,6 +17,7 @@ import {
   addArFSTagToTx,
   addTagsToTx,
   addUnixTimestampTagToTx,
+  coerceToUtf8,
   createUnencryptedEntityDataTransaction,
   EntityTagMap,
   parseUnixTimeTagToDate,
@@ -115,7 +116,7 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
           txTags,
           driveKey,
         )
-      : JSON.parse(txData as string);
+      : JSON.parse(coerceToUtf8(txData));
 
     const entity = plainToClass(DriveEntity, {
       ...entityTxData,

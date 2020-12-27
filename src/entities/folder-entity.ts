@@ -14,6 +14,7 @@ import {
   addArFSTagToTx,
   addUnixTimestampTagToTx,
   parseUnixTimeTagToDate,
+  coerceToUtf8,
 } from '../utils';
 import { Entity } from './entity';
 import { EntityType, Cipher, EntityTag } from './enums';
@@ -104,7 +105,7 @@ export class FolderEntity
           txTags,
           driveKey,
         )
-      : JSON.parse(txData as string);
+      : JSON.parse(coerceToUtf8(txData));
 
     const entity = plainToClass(FolderEntity, {
       ...entityTxData,

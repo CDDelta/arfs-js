@@ -19,6 +19,7 @@ import {
   addArFSTagToTx,
   addUnixTimestampTagToTx,
   parseUnixTimeTagToDate,
+  coerceToUtf8,
 } from '../utils';
 import { Cipher, EntityTag, EntityType } from './enums';
 import {
@@ -136,7 +137,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
           txTags,
           driveKey,
         )
-      : JSON.parse(txData as string);
+      : JSON.parse(coerceToUtf8(txData));
 
     const entity = plainToClass(FileEntity, {
       ...entityTxData,

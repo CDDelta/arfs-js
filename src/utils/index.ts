@@ -1,6 +1,7 @@
 import Arweave from 'arweave';
 import { ContentType, Entity, EntityTag } from '../entities';
 import { classToPlain } from 'class-transformer';
+import { TextDecoder } from 'util';
 
 /** Temporary Arweave transaction mock */
 export interface Transaction {
@@ -65,4 +66,12 @@ export async function createUnencryptedEntityDataTransaction(
   });
 
   return tx;
+}
+
+/**
+ * Returns the input as a UTF-8 string, decoding inbound ArrayBuffers into UTF-8
+ * and simply returning strings as is.
+ */
+export function coerceToUtf8(input: string | ArrayBuffer): string {
+  return typeof input === 'string' ? input : new TextDecoder().decode(input);
 }

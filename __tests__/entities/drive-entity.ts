@@ -1,6 +1,5 @@
 import Arweave from 'arweave';
 import { DriveEntity } from '../../src';
-import { TextDecoder } from 'util';
 
 const arweave = Arweave.init({
   host: 'arweave.net',
@@ -10,7 +9,7 @@ const arweave = Arweave.init({
 
 describe('DriveEntity', () => {
   describe('fromTransaction()', () => {
-    test('can decode', async () => {
+    test('can decode into class', async () => {
       const tx = await arweave.transactions.get(
         '0r8phv2OZDCNO69qQ6QO3jVJYoYPL2en_vUoWjxXz20',
       );
@@ -20,14 +19,14 @@ describe('DriveEntity', () => {
         return map;
       }, {});
 
-      console.log(
-        await DriveEntity.fromTransaction(
+      await expect(
+        DriveEntity.fromTransaction(
           tx.id,
           await arweave.wallets.ownerToAddress(tx.owner),
           txTagMap,
-          new TextDecoder().decode(tx.data),
+          tx.data,
         ),
-      );
+      ).resolves.toBeInstanceOf(DriveEntity);
     });
   });
 });
