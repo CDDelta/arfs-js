@@ -1,8 +1,8 @@
+import Arweave from 'arweave';
+import { TransactionInterface } from 'arweave/node/lib/transaction';
 import { Exclude } from 'class-transformer';
 import { Transaction } from '../utils';
-import Arweave from 'arweave';
 import { Cipher } from './enums';
-import { TransactionInterface } from 'arweave/node/lib/transaction';
 
 export abstract class Entity {
   /** The id of the transaction that represents this entity. */

@@ -1,28 +1,29 @@
+import Arweave from 'arweave';
+import { TransactionInterface } from 'arweave/node/lib/transaction';
 import { Exclude, plainToClass } from 'class-transformer';
 import {
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsUUID,
   validateOrReject,
 } from 'class-validator';
-import Arweave from 'arweave';
-import {
-  Transaction,
-  addTagsToTx,
-  EntityTagMap,
-  createUnencryptedEntityDataTransaction,
-  addArFSTagToTx,
-  addUnixTimestampTagToTx,
-  parseUnixTimeTagToDate,
-  coerceToUtf8,
-} from '../utils';
-import { Entity } from './entity';
-import { EntityType, Cipher, EntityTag } from './enums';
 import {
   createEncryptedEntityTransaction,
   decryptEntityTransactionData,
 } from '../crypto';
-import { TransactionInterface } from 'arweave/node/lib/transaction';
+import {
+  addArFSTagToTx,
+  addTagsToTx,
+  addUnixTimestampTagToTx,
+  coerceToUtf8,
+  createUnencryptedEntityDataTransaction,
+  EntityTagMap,
+  parseUnixTimeTagToDate,
+  Transaction,
+} from '../utils';
+import { Entity } from './entity';
+import { Cipher, EntityTag, EntityType } from './enums';
 
 export class FolderEntity
   extends Entity
@@ -55,6 +56,7 @@ export class FolderEntity
    *
    * Extracted from the folder entity transaction's `Parent-Folder-Id` tag.
    */
+  @IsOptional()
   @IsString()
   @Exclude({ toPlainOnly: true })
   parentFolderId: string | null;

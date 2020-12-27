@@ -1,32 +1,32 @@
+import Arweave from 'arweave';
+import { TransactionInterface } from 'arweave/node/lib/transaction';
 import { Exclude, plainToClass } from 'class-transformer';
 import {
   IsDate,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   IsUUID,
-  validate,
   validateOrReject,
 } from 'class-validator';
-import { Entity } from './entity';
-import Arweave from 'arweave';
-import {
-  addTagsToTx,
-  Transaction,
-  createUnencryptedEntityDataTransaction,
-  EntityTagMap,
-  addArFSTagToTx,
-  addUnixTimestampTagToTx,
-  parseUnixTimeTagToDate,
-  coerceToUtf8,
-} from '../utils';
-import { Cipher, EntityTag, EntityType } from './enums';
 import {
   createEncryptedEntityTransaction,
   decryptEntityTransactionData,
 } from '../crypto';
-import { TransactionInterface } from 'arweave/node/lib/transaction';
+import {
+  addArFSTagToTx,
+  addTagsToTx,
+  addUnixTimestampTagToTx,
+  coerceToUtf8,
+  createUnencryptedEntityDataTransaction,
+  EntityTagMap,
+  parseUnixTimeTagToDate,
+  Transaction,
+} from '../utils';
+import { Entity } from './entity';
+import { Cipher, EntityTag, EntityType } from './enums';
 
 export class FileEntity extends Entity implements FileEntityTransactionData {
   /**
@@ -87,6 +87,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
    *
    * Should be the same as the `Content-Type` tag on the data transaction.
    */
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   dataContentType: string;
@@ -131,8 +132,8 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
     txData: string | ArrayBuffer,
     driveKey: CryptoKey | null = null,
   ): Promise<FileEntity> {
-    const entityTxData = driveKey
-      ? await decryptEntityTransactionData<FileEntityTransactionData>(
+    const entityTxData: FileEntityTransactionData = driveKey
+      ? await decryptEntityTransactionData(
           txData as ArrayBuffer,
           txTags,
           driveKey,
@@ -147,6 +148,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
       id: txTags[EntityTag.FileId],
       driveId: txTags[EntityTag.DriveId],
       parentFolderId: txTags[EntityTag.ParentFolderId],
+      lastModifiedDate: new Date(entityTxData.lastModifiedDate),
     });
 
     await validateOrReject(entity);
@@ -185,6 +187,9 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
 export interface FileEntityTransactionData {
   name: string;
   size: number;
+  /**
+   * Represented in milliseconds since Unix epoch
+   */
   lastModifiedDate: Date;
   dataTxId: string;
   dataContentType: string;
