@@ -14,6 +14,7 @@ import {
 import {
   createEncryptedEntityTransaction,
   decryptEntityTransactionData,
+  deriveFileKey,
 } from 'src/crypto';
 import {
   addArFSTagToTx,
@@ -136,7 +137,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
       ? await decryptEntityTransactionData(
           txData as ArrayBuffer,
           txTags,
-          driveKey,
+          await deriveFileKey(driveKey, txTags[EntityTag.FileId]!),
         )
       : JSON.parse(coerceToUtf8(txData));
 

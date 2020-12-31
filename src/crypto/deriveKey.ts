@@ -1,6 +1,7 @@
 import Arweave from 'arweave';
 import { Cipher, DriveAuthMode } from 'src/entities';
-import uuid from 'uuid';
+import { getSubtleCrypto } from 'src/utils';
+import { parse as uuidParse } from 'uuid';
 
 let utf8Encoder: TextEncoder;
 
@@ -20,7 +21,7 @@ export async function deriveDriveKey(
   arweave: Arweave,
   mode: DriveAuthModeParams | PasswordDriveAuthModeParams,
 ): Promise<CryptoKey> {
-  const driveIdBytes = uuid.parse(driveId) as Uint8Array;
+  const driveIdBytes = uuidParse(driveId) as Uint8Array;
 
   const walletSignature = null!;
 
@@ -40,7 +41,7 @@ export async function deriveDriveKey(
         (mode as PasswordDriveAuthModeParams).password,
       );
 
-      return crypto.subtle.deriveKey(
+      return await getSubtleCrypto().deriveKey(
         {
           name: 'HKDF',
           hash: 'SHA-256',
@@ -51,8 +52,8 @@ export async function deriveDriveKey(
           name: 'AES-GCM',
           length: 256,
         },
-        false,
-        ['encrypt', 'decrypt', 'deriveKey'],
+        true,
+        ['encrypt', 'decrypt'],
       );
   }
 }
@@ -66,18 +67,30 @@ export async function deriveDriveKey(
  * @param driveKey the key of the drive this file is in.
  */
 export async function deriveFileKey(
-  fileId: string,
   driveKey: CryptoKey,
+  fileId: string,
 ): Promise<CryptoKey> {
-  const fileIdBytes = uuid.parse(fileId) as Uint8Array;
+  const subtleCrypto = getSubtleCrypto();
 
-  return crypto.subtle.deriveKey(
+  const fileIdBytes = uuidParse(fileId) as Uint8Array;
+  const driveKeyBytes = await subtleCrypto.exportKey('raw', driveKey);
+
+  const hkdfDriveKey = await subtleCrypto.importKey(
+    'raw',
+    driveKeyBytes,
+    'HKDF',
+    false,
+    ['deriveKey'],
+  );
+
+  return await subtleCrypto.deriveKey(
     {
       name: 'HKDF',
       hash: 'SHA-256',
+      salt: new Uint8Array(0),
       info: fileIdBytes,
     },
-    driveKey,
+    hkdfDriveKey,
     {
       name: 'AES-GCM',
       length: 256,
