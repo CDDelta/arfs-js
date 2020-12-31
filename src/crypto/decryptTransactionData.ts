@@ -1,5 +1,7 @@
-import { Cipher, EntityTag } from '../entities';
-import { EntityTagMap } from '../utils';
+import { b64UrlToBuffer } from 'arweave/node/lib/utils';
+import { Cipher, EntityTag } from 'src/entities';
+import { EntityTagMap, getSubtleCrypto } from 'src/utils';
+import { TextDecoder } from 'util';
 
 let utf8Decoder: TextDecoder;
 
@@ -33,15 +35,21 @@ export async function decryptTransactionData(
 
   if (txTags[EntityTag.Cipher] === Cipher.AES256GCM) {
     const iv = txTags[EntityTag.CipherIV];
-    if (iv) {
-      cryptoAlgo = {
-        name: 'AES-GCM',
-        iv: iv,
-      };
+    if (!iv) {
+      throw Error('No IV specified for AES-GCM.');
     }
+
+    cryptoAlgo = {
+      name: 'AES-GCM',
+      iv: b64UrlToBuffer(iv),
+    } as AesGcmParams;
   }
 
-  const decryptedData = await crypto.subtle.decrypt(cryptoAlgo, key, txData);
+  const decryptedData = await getSubtleCrypto().decrypt(
+    cryptoAlgo,
+    key,
+    txData,
+  );
 
   return decryptedData;
 }

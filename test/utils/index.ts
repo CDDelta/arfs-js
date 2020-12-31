@@ -1,5 +1,5 @@
 import Arweave from 'arweave';
-import { EntityTagMap } from '../../src/utils';
+import { EntityTagMap, getSubtleCrypto } from '../../src/utils';
 
 export function getArweaveClient(): Arweave {
   return Arweave.init({
@@ -16,4 +16,11 @@ export function tagListToMap(
     map[atob(tag.name)] = atob(tag.value);
     return map;
   }, {});
+}
+
+export async function importKey(bytes: ArrayBuffer): Promise<CryptoKey> {
+  return await getSubtleCrypto().importKey('raw', bytes, 'AES-GCM', false, [
+    'encrypt',
+    'decrypt',
+  ]);
 }

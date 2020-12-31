@@ -1,11 +1,12 @@
+import { b64UrlToBuffer } from 'arweave/node/lib/utils';
 import { DriveEntity, DrivePrivacy } from '../../src';
-import { getArweaveClient, tagListToMap } from '../utils';
+import { getArweaveClient, importKey, tagListToMap } from '../utils';
 
 const arweave = getArweaveClient();
 
 describe('DriveEntity', () => {
   describe('fromTransaction()', () => {
-    test('can decode into class', async () => {
+    test('can decode public entity into class', async () => {
       const tx = await arweave.transactions.get(
         '0r8phv2OZDCNO69qQ6QO3jVJYoYPL2en_vUoWjxXz20',
       );
@@ -16,6 +17,24 @@ describe('DriveEntity', () => {
           await arweave.wallets.ownerToAddress(tx.owner),
           tagListToMap(tx.tags),
           tx.data,
+        ),
+      ).resolves.toBeInstanceOf(DriveEntity);
+    });
+
+    test('can decode private entity into class', async () => {
+      const tx = await arweave.transactions.get(
+        'YglbTBLvYpHjg1M-nlIz3FUqvLXIg39s05oQvotpncM',
+      );
+
+      await expect(
+        DriveEntity.fromTransaction(
+          tx.id,
+          await arweave.wallets.ownerToAddress(tx.owner),
+          tagListToMap(tx.tags),
+          tx.data,
+          await importKey(
+            b64UrlToBuffer('K7jsNncKDgDBi_1xnNi9tigst4jQKeaBxrb0GAZMRYA'),
+          ),
         ),
       ).resolves.toBeInstanceOf(DriveEntity);
     });

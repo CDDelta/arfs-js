@@ -1,9 +1,9 @@
 import Arweave from 'arweave';
-import { classToPlain } from 'class-transformer';
-import { bufferTob64Url } from 'arweave/node/lib/utils';
-import { Cipher, ContentType, Entity } from '../entities';
-import { addTagsToTx, Transaction } from '../utils';
 import { TransactionInterface } from 'arweave/node/lib/transaction';
+import { bufferTob64Url } from 'arweave/node/lib/utils';
+import { classToPlain } from 'class-transformer';
+import { Cipher, ContentType, Entity } from 'src/entities';
+import { addTagsToTx, Transaction } from 'src/utils';
 
 let utf8Encoder: TextEncoder;
 

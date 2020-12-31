@@ -6,9 +6,10 @@
       "strictNullChecks": true,
       "experimentalDecorators": true,
       "esModuleInterop": true,
-      "outDir": "./dist"
+      "outDir": "./dist",
+      "baseUrl": "./"
     },
     "include": [
       "src/**/*"
-    ]
+    ],
   }

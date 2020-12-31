@@ -5,7 +5,7 @@ const arweave = getArweaveClient();
 
 describe('FileEntity', () => {
   describe('fromTransaction()', () => {
-    test('can decode into class', async () => {
+    test('can decode public entity into class', async () => {
       const tx = await arweave.transactions.get(
         '2NgclyVCmuEQeFPTAjPSMjNk6WpFHr7UGARPjVa6owQ',
       );

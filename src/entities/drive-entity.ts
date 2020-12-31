@@ -12,7 +12,7 @@ import {
 import {
   createEncryptedEntityTransaction,
   decryptEntityTransactionData,
-} from '../crypto';
+} from 'src/crypto';
 import {
   addArFSTagToTx,
   addTagsToTx,
@@ -22,7 +22,7 @@ import {
   EntityTagMap,
   parseUnixTimeTagToDate,
   Transaction,
-} from '../utils';
+} from 'src/utils';
 import { Entity } from './entity';
 import {
   Cipher,
@@ -101,7 +101,7 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
    *
    * Throws an error if the provided parameters form an invalid drive entity.
    *
-   * @param txData expected to be of type `string` if the entity is unencrypted, `ArrayBuffer` if the entity is encrypted.
+   * @param txData expected to be of type `ArrayBuffer` if the entity is encrypted.
    */
   static async fromTransaction(
     txId: string,

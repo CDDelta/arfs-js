@@ -1,7 +1,7 @@
 import Arweave from 'arweave';
 import { TransactionInterface } from 'arweave/node/lib/transaction';
 import { Exclude } from 'class-transformer';
-import { Transaction } from '../utils';
+import { Transaction } from 'src/utils';
 import { Cipher } from './enums';
 
 export abstract class Entity {

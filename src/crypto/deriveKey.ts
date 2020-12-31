@@ -1,6 +1,6 @@
-import { Cipher, DriveAuthMode } from '../entities';
-import uuid from 'uuid';
 import Arweave from 'arweave';
+import { Cipher, DriveAuthMode } from 'src/entities';
+import uuid from 'uuid';
 
 let utf8Encoder: TextEncoder;
 
@@ -8,7 +8,7 @@ let utf8Encoder: TextEncoder;
  * Derives a drive key that can be used for encrypting and decrypting drive/folder entities,
  * and deriving file keys.
  *
- * Currently only supports AES256-GCM.
+ * Currently only supports AES-GCM.
  *
  * @param wallet the wallet of the owner of this drive.
  * @param driveId the id of the drive. Used to make this key unique for the provided wallet.

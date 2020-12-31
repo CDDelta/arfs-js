@@ -1,6 +1,7 @@
 import Arweave from 'arweave';
-import { ContentType, Entity, EntityTag } from '../entities';
 import { classToPlain } from 'class-transformer';
+import * as crypto from 'crypto';
+import { ContentType, Entity, EntityTag } from 'src/entities';
 import { TextDecoder } from 'util';
 
 /** Temporary Arweave transaction mock */
@@ -74,4 +75,8 @@ export async function createUnencryptedEntityDataTransaction(
  */
 export function coerceToUtf8(input: string | ArrayBuffer): string {
   return typeof input === 'string' ? input : new TextDecoder().decode(input);
+}
+
+export function getSubtleCrypto(): SubtleCrypto {
+  return (crypto as any).webcrypto.subtle;
 }
