@@ -2,7 +2,8 @@
   "name": "arfs",
   "version": "0.0.5",
   "scripts": {
-    "build": "tsc  -p tsconfig.build.json"
+    "build": "tsc  -p tsconfig.build.json",
+    "test": "npx jest"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

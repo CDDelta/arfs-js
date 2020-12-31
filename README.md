@@ -1,5 +1,7 @@
 # ArFS-JS
 
+![tests](https://github.com/CDDelta/arfs-js/workflows/tests/badge.svg)
+
 A JS/TS implementation of the ArFS spec.
 
 ## Development
@@ -19,5 +21,5 @@ npm publish
 To execute the tests, run:
 
 ```bash
-npx jest
+npm test
 ```
