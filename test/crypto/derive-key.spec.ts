@@ -2,7 +2,7 @@ import { b64UrlToBuffer, bufferTob64Url } from 'arweave/node/lib/utils';
 import { Cipher, deriveDriveKey, deriveFileKey, DriveAuthMode } from 'src';
 import { getSubtleCrypto } from 'src/utils';
 import testKey from '../fixtures/test-key.json';
-import { importKey } from '../utils';
+import { importAesGcmKey } from '../utils';
 
 describe('deriveDriveKey()', () => {
   test('can derive correct password key', async () => {
@@ -26,7 +26,7 @@ describe('deriveDriveKey()', () => {
 
 describe('deriveFileKey()', () => {
   test('can derive correct file key', async () => {
-    const driveKey = await importKey(
+    const driveKey = await importAesGcmKey(
       b64UrlToBuffer('_BswoSJy8cGrHQN7xge2naIiGajCEV7yfC0MXD_XBig'),
     );
 

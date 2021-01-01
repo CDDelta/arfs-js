@@ -1,6 +1,6 @@
 import { b64UrlToBuffer } from 'arweave/node/lib/utils';
 import { FileEntity } from '../../src';
-import { getArweaveClient, importKey, tagListToMap } from '../utils';
+import { getArweaveClient, importAesGcmKey, tagListToMap } from '../utils';
 
 const arweave = getArweaveClient();
 
@@ -32,7 +32,7 @@ describe('FileEntity', () => {
           await arweave.wallets.ownerToAddress(tx.owner),
           tagListToMap(tx.tags),
           tx.data,
-          await importKey(
+          await importAesGcmKey(
             b64UrlToBuffer('eY6xT7D2St-rDW7V-mUyvzEREhOpt4innaEDtcWeZqU'),
           ),
         ),

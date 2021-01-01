@@ -18,7 +18,7 @@ export function tagListToMap(
   }, {});
 }
 
-export async function importKey(bytes: ArrayBuffer): Promise<CryptoKey> {
+export async function importAesGcmKey(bytes: ArrayBuffer): Promise<CryptoKey> {
   return await getSubtleCrypto().importKey('raw', bytes, 'AES-GCM', true, [
     'encrypt',
     'decrypt',
