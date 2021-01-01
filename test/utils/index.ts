@@ -1,4 +1,5 @@
 import Arweave from 'arweave';
+import { b64UrlToString } from 'arweave/node/lib/utils';
 import { EntityTagMap, getSubtleCrypto } from '../../src/utils';
 
 export function getArweaveClient(): Arweave {
@@ -13,7 +14,7 @@ export function tagListToMap(
   tags: { name: string; value: string }[],
 ): EntityTagMap {
   return tags.reduce((map, tag) => {
-    map[atob(tag.name)] = atob(tag.value);
+    map[b64UrlToString(tag.name)] = b64UrlToString(tag.value);
     return map;
   }, {});
 }
