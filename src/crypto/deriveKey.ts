@@ -1,6 +1,6 @@
-import Arweave from 'arweave';
 import { Cipher, DriveAuthMode } from 'src/entities';
 import { getSubtleCrypto } from 'src/utils';
+import { TextEncoder } from 'util';
 import { parse as uuidParse } from 'uuid';
 
 let utf8Encoder: TextEncoder;
@@ -17,26 +17,46 @@ let utf8Encoder: TextEncoder;
  */
 export async function deriveDriveKey(
   driveId: string,
-  wallet,
-  arweave: Arweave,
+  walletJwk: Object,
   mode: DriveAuthModeParams | PasswordDriveAuthModeParams,
 ): Promise<CryptoKey> {
-  const driveIdBytes = uuidParse(driveId) as Uint8Array;
+  utf8Encoder ||= new TextEncoder();
 
-  const walletSignature = null!;
+  const subtleCrypto = getSubtleCrypto();
 
-  const walletSignatureKey = await crypto.subtle.importKey(
+  const walletKey = await subtleCrypto.importKey(
+    'jwk',
+    walletJwk,
+    {
+      name: 'RSA-PSS',
+      hash: 'SHA-256',
+    },
+    false,
+    ['sign'],
+  );
+
+  const walletSignature = await subtleCrypto.sign(
+    {
+      name: 'RSA-PSS',
+      saltLength: 0,
+    },
+    walletKey,
+    new Uint8Array([
+      ...utf8Encoder.encode('drive'),
+      ...(uuidParse(driveId) as Uint8Array),
+    ]),
+  );
+
+  const walletSignatureKey = await subtleCrypto.importKey(
     'raw',
     walletSignature,
-    'AES-GCM',
+    'HKDF',
     false,
     ['deriveKey'],
   );
 
   switch (mode.name) {
     case DriveAuthMode.Password:
-      utf8Encoder ||= new TextEncoder();
-
       const encodedPassword = utf8Encoder.encode(
         (mode as PasswordDriveAuthModeParams).password,
       );
@@ -46,6 +66,7 @@ export async function deriveDriveKey(
           name: 'HKDF',
           hash: 'SHA-256',
           info: encodedPassword,
+          salt: new Uint8Array(0),
         },
         walletSignatureKey,
         {
@@ -95,7 +116,7 @@ export async function deriveFileKey(
       name: 'AES-GCM',
       length: 256,
     },
-    false,
+    true,
     ['encrypt', 'decrypt'],
   );
 }

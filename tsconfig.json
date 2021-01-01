@@ -7,6 +7,7 @@
       "experimentalDecorators": true,
       "esModuleInterop": true,
       "outDir": "./dist",
-      "baseUrl": "./"
+      "baseUrl": "./",
+      "resolveJsonModule": true
     },
   }
