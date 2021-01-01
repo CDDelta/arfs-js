@@ -3,7 +3,7 @@
   "version": "0.0.5",
   "scripts": {
     "build": "tsc  -p tsconfig.build.json",
-    "test": "npx jest"
+    "test": "npx jest --coverage"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
