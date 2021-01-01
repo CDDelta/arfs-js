@@ -1,4 +1,5 @@
 import Arweave from 'arweave';
+import { TransactionInterface } from 'arweave/node/lib/transaction';
 import { classToPlain } from 'class-transformer';
 import * as crypto from 'crypto';
 import { ContentType, Entity, EntityTag } from 'src/entities';
@@ -8,6 +9,8 @@ import { TextDecoder } from 'util';
 export interface Transaction {
   id: string;
   owner: string;
+  tags: { name: string; value: string }[];
+  data: Uint8Array;
   addTag(name: string, value: string): void;
 }
 
@@ -38,15 +41,16 @@ export function addArFSTagToTx(tx: Transaction): void {
 /**
  * Timestamps the transaction with the current unix time in seconds by adding a `Unix-Time tag.
  */
-export function addUnixTimestampTagToTx(tx: Transaction): void {
+export function addUnixTimestampTagToTx(
+  tx: Transaction,
+  timestamp: Date,
+): void {
   addTagsToTx(tx, {
-    'Unix-Time': (Date.now() / 1000).toString(),
+    'Unix-Time': (timestamp.valueOf() / 1000).toString(),
   });
 }
 
-export function parseUnixTimeTagToDate(
-  tagValue: string | undefined,
-): Date | null {
+export function parseUnixTimeTagToDate(tagValue?: string): Date | null {
   return tagValue ? new Date(parseInt(tagValue) * 1000) : null;
 }
 
@@ -57,8 +61,10 @@ export function parseUnixTimeTagToDate(
 export async function createUnencryptedEntityDataTransaction(
   entity: Entity,
   arweave: Arweave,
+  txAttributes: Partial<TransactionInterface>,
 ): Promise<Transaction> {
   const tx = await arweave.createTransaction({
+    ...txAttributes,
     data: JSON.stringify(classToPlain(entity)),
   });
 

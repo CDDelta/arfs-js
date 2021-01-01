@@ -31,18 +31,24 @@ export async function decryptTransactionData(
   txTags: EntityTagMap,
   key: CryptoKey,
 ): Promise<ArrayBuffer> {
-  let cryptoAlgo;
+  let cryptoAlgo: Algorithm;
 
-  if (txTags[EntityTag.Cipher] === Cipher.AES256GCM) {
-    const iv = txTags[EntityTag.CipherIV];
-    if (!iv) {
-      throw Error('No IV specified for AES-GCM.');
-    }
+  const cipher = txTags[EntityTag.Cipher];
 
-    cryptoAlgo = {
-      name: 'AES-GCM',
-      iv: b64UrlToBuffer(iv),
-    } as AesGcmParams;
+  switch (cipher) {
+    case Cipher.AES256GCM:
+      const iv = txTags[EntityTag.CipherIV];
+      if (!iv) {
+        throw Error('No IV specified for AES-GCM.');
+      }
+
+      cryptoAlgo = {
+        name: 'AES-GCM',
+        iv: b64UrlToBuffer(iv),
+      } as AesGcmParams;
+      break;
+    default:
+      throw Error('No valid cipher specified on transaction.');
   }
 
   const decryptedData = await getSubtleCrypto().decrypt(

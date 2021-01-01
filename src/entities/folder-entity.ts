@@ -132,10 +132,14 @@ export class FolderEntity
             name: cipher,
             key: driveKey,
           })
-        : await createUnencryptedEntityDataTransaction(this, arweave);
+        : await createUnencryptedEntityDataTransaction(
+            this,
+            arweave,
+            txAttributes,
+          );
 
     addArFSTagToTx(tx);
-    addUnixTimestampTagToTx(tx);
+    addUnixTimestampTagToTx(tx, this.createdAt);
 
     const tags: EntityTagMap = {
       'Entity-Type': EntityType.Folder,

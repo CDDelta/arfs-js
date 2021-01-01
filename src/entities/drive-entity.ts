@@ -62,7 +62,7 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
   @IsOptional()
   @IsEnum(DriveAuthMode)
   @Exclude({ toPlainOnly: true })
-  authMode: DriveAuthMode | undefined;
+  authMode?: DriveAuthMode;
 
   @IsString()
   @IsNotEmpty()
@@ -71,6 +71,7 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
   /** The id of the folder that represents the root of this drive. */
   @IsString()
   @IsNotEmpty()
+  @IsUUID()
   rootFolderId: string;
 
   constructor(
@@ -140,10 +141,14 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
             name: cipher,
             key: driveKey,
           })
-        : await createUnencryptedEntityDataTransaction(this, arweave);
+        : await createUnencryptedEntityDataTransaction(
+            this,
+            arweave,
+            txAttributes,
+          );
 
     addArFSTagToTx(tx);
-    addUnixTimestampTagToTx(tx);
+    addUnixTimestampTagToTx(tx, this.createdAt);
 
     addTagsToTx(tx, {
       'Entity-Type': EntityType.Drive,

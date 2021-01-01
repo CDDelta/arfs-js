@@ -59,6 +59,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
    */
   @IsString()
   @IsNotEmpty()
+  @IsUUID()
   @Exclude({ toPlainOnly: true })
   parentFolderId: string;
 
@@ -86,12 +87,12 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
   /**
    * The `Content-Type` of the raw binary data.
    *
-   * Should be the same as the `Content-Type` tag on the data transaction.
+   * Should be the same as the `Content-Type` tag on the data transaction for public data.
    */
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  dataContentType: string;
+  dataContentType?: string;
 
   constructor(
     properties: Omit<FileEntity, keyof Omit<Entity, 'createdAt'>>,
@@ -153,18 +154,22 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
     arweave: Arweave,
     txAttributes: Partial<TransactionInterface>,
     cipher: Cipher | null = null,
-    fileKey: CryptoKey | null = null,
+    driveKey: CryptoKey | null = null,
   ): Promise<Transaction> {
     const tx =
-      cipher && fileKey
+      cipher && driveKey
         ? await createEncryptedEntityTransaction(this, arweave, txAttributes, {
             name: cipher,
-            key: fileKey,
+            key: await deriveFileKey(driveKey, this.id),
           })
-        : await createUnencryptedEntityDataTransaction(this, arweave);
+        : await createUnencryptedEntityDataTransaction(
+            this,
+            arweave,
+            txAttributes,
+          );
 
     addArFSTagToTx(tx);
-    addUnixTimestampTagToTx(tx);
+    addUnixTimestampTagToTx(tx, this.createdAt);
 
     addTagsToTx(tx, {
       'Entity-Type': EntityType.File,
@@ -185,5 +190,5 @@ export interface FileEntityTransactionData {
    */
   lastModifiedDate: Date;
   dataTxId: string;
-  dataContentType: string;
+  dataContentType?: string;
 }

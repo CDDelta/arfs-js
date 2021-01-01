@@ -2,8 +2,9 @@ import Arweave from 'arweave';
 import { TransactionInterface } from 'arweave/node/lib/transaction';
 import { bufferTob64Url } from 'arweave/node/lib/utils';
 import { classToPlain } from 'class-transformer';
+import { randomBytes } from 'crypto';
 import { Cipher, ContentType, Entity } from 'src/entities';
-import { addTagsToTx, Transaction } from 'src/utils';
+import { addTagsToTx, getSubtleCrypto, Transaction } from 'src/utils';
 
 let utf8Encoder: TextEncoder;
 
@@ -35,18 +36,21 @@ export async function createEncryptedTransaction(
   txAttributes: Partial<TransactionInterface>,
   cipher: CipherParams,
 ): Promise<Transaction> {
-  let cryptoAlgo: AesGcmParams;
+  const subtleCrypto = getSubtleCrypto();
+
+  let cryptoAlgo: Algorithm;
 
   switch (cipher.name) {
     case Cipher.AES256GCM:
       cryptoAlgo = {
         name: 'AES-GCM',
         // Use a 96-bit IV for AES-GCM as recommended.
-        iv: crypto.getRandomValues(new Uint8Array(96 / 8)),
-      };
+        iv: randomBytes(96 / 8),
+      } as AesGcmParams;
+      break;
   }
 
-  const encryptedData = await crypto.subtle.encrypt(
+  const encryptedData = await subtleCrypto.encrypt(
     cryptoAlgo,
     cipher.key,
     data,
@@ -60,11 +64,15 @@ export async function createEncryptedTransaction(
   switch (cipher.name) {
     case Cipher.AES256GCM:
       addTagsToTx(tx, {
-        'Cipher-IV': bufferTob64Url(cryptoAlgo.iv as Uint8Array),
+        'Cipher-IV': bufferTob64Url(
+          (cryptoAlgo as AesGcmParams).iv as Uint8Array,
+        ),
       });
+      break;
   }
 
   addTagsToTx(tx, {
+    Cipher: cipher.name,
     'Content-Type': ContentType.OctetStream,
   });
 
