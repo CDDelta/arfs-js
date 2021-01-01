@@ -104,15 +104,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
       return;
     }
 
-    this.id = properties.id;
-    this.driveId = properties.driveId;
-    this.parentFolderId = properties.parentFolderId;
-    this.name = properties.name;
-    this.size = properties.size;
-    this.lastModifiedDate = properties.lastModifiedDate;
-    this.dataTxId = properties.dataTxId;
-    this.dataContentType = properties.dataContentType;
-    this.createdAt = properties.createdAt;
+    Object.assign(this, properties);
 
     if (validate) {
       validateOrReject(this);

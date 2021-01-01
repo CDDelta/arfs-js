@@ -76,11 +76,7 @@ export class FolderEntity
       return;
     }
 
-    this.id = properties.id;
-    this.driveId = properties.driveId;
-    this.parentFolderId = properties.parentFolderId;
-    this.name = properties.name;
-    this.createdAt = properties.createdAt;
+    Object.assign(this, properties);
 
     if (validate) {
       validateOrReject(this);

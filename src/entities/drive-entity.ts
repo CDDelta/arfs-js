@@ -84,12 +84,7 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
       return;
     }
 
-    this.id = properties.id;
-    this.privacy = properties.privacy;
-    this.authMode = properties.authMode;
-    this.name = properties.name;
-    this.rootFolderId = properties.rootFolderId;
-    this.createdAt = properties.createdAt;
+    Object.assign(this, properties);
 
     if (validate) {
       validateOrReject(this);
