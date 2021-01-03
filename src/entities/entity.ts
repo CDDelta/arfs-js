@@ -38,8 +38,8 @@ export abstract class Entity {
   abstract asTransaction(
     arweave: Arweave,
     txAttributes: Partial<TransactionAttributes>,
-    cipher: Cipher | null,
-    encryptionKey: CryptoKey | null,
+    cipher?: Cipher,
+    encryptionKey?: CryptoKey,
   ): Promise<Transaction>;
 
   /**
@@ -51,7 +51,7 @@ export abstract class Entity {
   /*abstract asDataItem(
     arweaveBundler: ArweaveBundler,
     txAttributes: Partial<TransactionAttributes>,
-    cipher: Cipher | null,
-    encryptionKey: CryptoKey | null,
+    cipher?: Cipher,
+    encryptionKey?: CryptoKey,
   ): Promise<Transaction>;*/
 }

@@ -104,7 +104,7 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
     txOwnerAddress: string,
     txTags: EntityTagMap,
     txData: string | ArrayBuffer,
-    driveKey: CryptoKey | null = null,
+    driveKey?: CryptoKey,
   ): Promise<DriveEntity> {
     const entityTxData = driveKey
       ? await decryptEntityTransactionData<DriveEntityTransactionData>(
@@ -146,8 +146,8 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
   async asTransaction(
     arweave: Arweave,
     txAttributes: Partial<TransactionAttributes>,
-    cipher: Cipher | null = null,
-    driveKey: CryptoKey | null = null,
+    cipher?: Cipher,
+    driveKey?: CryptoKey,
   ): Promise<Transaction> {
     const tx =
       cipher && driveKey

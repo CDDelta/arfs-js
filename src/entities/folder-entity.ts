@@ -95,7 +95,7 @@ export class FolderEntity
     txOwnerAddress: string,
     txTags: EntityTagMap,
     txData: string | ArrayBuffer,
-    driveKey: CryptoKey | null = null,
+    driveKey?: CryptoKey,
   ): Promise<FolderEntity> {
     const entityTxData = driveKey
       ? await decryptEntityTransactionData<FolderEntityTransactionData>(
@@ -137,8 +137,8 @@ export class FolderEntity
   async asTransaction(
     arweave: Arweave,
     txAttributes: Partial<TransactionAttributes>,
-    cipher: Cipher | null = null,
-    driveKey: CryptoKey | null = null,
+    cipher?: Cipher,
+    driveKey?: CryptoKey,
   ): Promise<Transaction> {
     const tx =
       cipher && driveKey

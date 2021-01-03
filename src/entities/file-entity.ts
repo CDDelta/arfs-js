@@ -124,7 +124,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
     txOwnerAddress: string,
     txTags: EntityTagMap,
     txData: string | ArrayBuffer,
-    driveKey: CryptoKey | null = null,
+    driveKey?: CryptoKey,
   ): Promise<FileEntity> {
     const entityTxData: FileEntityTransactionData = driveKey
       ? await decryptEntityTransactionData(
@@ -164,8 +164,8 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
   async asTransaction(
     arweave: Arweave,
     txAttributes: Partial<TransactionAttributes>,
-    cipher: Cipher | null = null,
-    driveKey: CryptoKey | null = null,
+    cipher?: Cipher,
+    driveKey?: CryptoKey,
   ): Promise<Transaction> {
     const tx =
       cipher && driveKey
