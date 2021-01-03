@@ -1,5 +1,3 @@
-import Arweave from 'arweave';
-import { DataItemJson } from 'arweave-bundles';
 import { Exclude, plainToClass } from 'class-transformer';
 import {
   IsEnum,
@@ -9,28 +7,15 @@ import {
   IsUUID,
   validateOrReject,
 } from 'class-validator';
+import { decryptEntityTransactionData } from 'src/crypto';
 import {
-  createEncryptedEntityDataItem,
-  createEncryptedEntityTransaction,
-  decryptEntityTransactionData,
-} from 'src/crypto';
-import {
-  addTagsToDataItem,
-  addTagsToTx,
   arfsVersion,
-  ArweaveBundler,
   coerceToUtf8,
-  createUnencryptedEntityDataItem,
-  createUnencryptedEntityDataTransaction,
-  DataItemAttributes,
   formatTxUnixTime,
   parseUnixTimeTagToDate,
-  Transaction,
-  TransactionAttributes,
 } from 'src/utils';
 import { Entity } from './entity';
 import {
-  Cipher,
   DriveAuthMode,
   DrivePrivacy,
   EntityTag,
@@ -148,48 +133,6 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
     tags['Drive-Auth-Mode'] ||= this.authMode;
 
     return tags;
-  }
-
-  async asTransaction(
-    arweave: Arweave,
-    txAttributes: TransactionAttributes,
-    cipher?: Cipher,
-    driveKey?: CryptoKey,
-  ): Promise<Transaction> {
-    const tx =
-      cipher && driveKey
-        ? await createEncryptedEntityTransaction(this, arweave, txAttributes, {
-            name: cipher,
-            key: driveKey,
-          })
-        : await createUnencryptedEntityDataTransaction(
-            this,
-            arweave,
-            txAttributes,
-          );
-
-    addTagsToTx(tx, this.getEntityTransactionTags());
-
-    return tx;
-  }
-
-  async asDataItem(
-    bundler: ArweaveBundler,
-    itemAttributes: DataItemAttributes,
-    cipher?: Cipher,
-    driveKey?: CryptoKey,
-  ): Promise<DataItemJson> {
-    const item =
-      cipher && driveKey
-        ? await createEncryptedEntityDataItem(this, bundler, itemAttributes, {
-            name: cipher,
-            key: driveKey,
-          })
-        : await createUnencryptedEntityDataItem(this, bundler, itemAttributes);
-
-    addTagsToDataItem(item, this.getEntityTransactionTags(), bundler);
-
-    return item;
   }
 }
 

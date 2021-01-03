@@ -11,20 +11,11 @@ import {
   IsUUID,
   validateOrReject,
 } from 'class-validator';
+import { decryptEntityTransactionData, deriveFileKey } from 'src/crypto';
 import {
-  createEncryptedEntityDataItem,
-  createEncryptedEntityTransaction,
-  decryptEntityTransactionData,
-  deriveFileKey,
-} from 'src/crypto';
-import {
-  addTagsToDataItem,
-  addTagsToTx,
   arfsVersion,
   ArweaveBundler,
   coerceToUtf8,
-  createUnencryptedEntityDataItem,
-  createUnencryptedEntityDataTransaction,
   DataItemAttributes,
   formatTxUnixTime,
   parseUnixTimeTagToDate,
@@ -172,21 +163,12 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
     cipher?: Cipher,
     driveKey?: CryptoKey,
   ): Promise<Transaction> {
-    const tx =
-      cipher && driveKey
-        ? await createEncryptedEntityTransaction(this, arweave, txAttributes, {
-            name: cipher,
-            key: await deriveFileKey(driveKey, this.id),
-          })
-        : await createUnencryptedEntityDataTransaction(
-            this,
-            arweave,
-            txAttributes,
-          );
-
-    addTagsToTx(tx, this.getEntityTransactionTags());
-
-    return tx;
+    return await super.asTransaction(
+      arweave,
+      txAttributes,
+      cipher,
+      driveKey ? await deriveFileKey(driveKey, this.id) : undefined,
+    );
   }
 
   async asDataItem(
@@ -195,17 +177,12 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
     cipher?: Cipher,
     driveKey?: CryptoKey,
   ): Promise<DataItemJson> {
-    const item =
-      cipher && driveKey
-        ? await createEncryptedEntityDataItem(this, bundler, itemAttributes, {
-            name: cipher,
-            key: await deriveFileKey(driveKey, this.id),
-          })
-        : await createUnencryptedEntityDataItem(this, bundler, itemAttributes);
-
-    addTagsToDataItem(item, this.getEntityTransactionTags(), bundler);
-
-    return item;
+    return await super.asDataItem(
+      bundler,
+      itemAttributes,
+      cipher,
+      driveKey ? await deriveFileKey(driveKey, this.id) : undefined,
+    );
   }
 }
 

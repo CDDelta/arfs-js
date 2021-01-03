@@ -2,7 +2,15 @@ import Arweave from 'arweave';
 import { DataItemJson } from 'arweave-bundles';
 import { Exclude } from 'class-transformer';
 import {
+  createEncryptedEntityDataItem,
+  createEncryptedEntityTransaction,
+} from 'src/crypto';
+import {
+  addTagsToDataItem,
+  addTagsToTx,
   ArweaveBundler,
+  createUnencryptedEntityDataItem,
+  createUnencryptedEntityDataTransaction,
   DataItemAttributes,
   Transaction,
   TransactionAttributes,
@@ -41,12 +49,28 @@ export abstract class Entity {
    *
    * Optionally specify a cipher and encryption key to encrypt this entity's data.
    */
-  abstract asTransaction(
+  async asTransaction(
     arweave: Arweave,
     txAttributes: TransactionAttributes,
     cipher?: Cipher,
-    encryptionKey?: CryptoKey,
-  ): Promise<Transaction>;
+    driveKey?: CryptoKey,
+  ): Promise<Transaction> {
+    const tx =
+      cipher && driveKey
+        ? await createEncryptedEntityTransaction(this, arweave, txAttributes, {
+            name: cipher,
+            key: driveKey,
+          })
+        : await createUnencryptedEntityDataTransaction(
+            this,
+            arweave,
+            txAttributes,
+          );
+
+    addTagsToTx(tx, this.getEntityTransactionTags());
+
+    return tx;
+  }
 
   /**
    * Converts this entity into an unsigned data item that can be included as part of an ANS-102
@@ -54,10 +78,22 @@ export abstract class Entity {
    *
    * Optionally specify a cipher and encryption key to encrypt this entity's data.
    */
-  abstract asDataItem(
+  async asDataItem(
     bundler: ArweaveBundler,
     itemAttributes: DataItemAttributes,
     cipher?: Cipher,
-    encryptionKey?: CryptoKey,
-  ): Promise<DataItemJson>;
+    driveKey?: CryptoKey,
+  ): Promise<DataItemJson> {
+    const item =
+      cipher && driveKey
+        ? await createEncryptedEntityDataItem(this, bundler, itemAttributes, {
+            name: cipher,
+            key: driveKey,
+          })
+        : await createUnencryptedEntityDataItem(this, bundler, itemAttributes);
+
+    addTagsToDataItem(item, this.getEntityTransactionTags(), bundler);
+
+    return item;
+  }
 }
