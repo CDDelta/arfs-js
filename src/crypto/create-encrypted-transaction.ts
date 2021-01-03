@@ -19,8 +19,8 @@ let utf8Encoder: TextEncoder;
  * Encrypts the provided entity's data into an Arweave transaction, and
  * adds the necessary tags to decrypt it later on.
  */
-export async function createEncryptedEntityTransaction(
-  entity: Entity,
+export async function createEncryptedEntityTransaction<T>(
+  entity: Entity<T>,
   arweave: Arweave,
   txAttributes: TransactionAttributes,
   cipher: CipherParams,
@@ -59,8 +59,8 @@ export async function createEncryptedTransaction(
  * Encrypts the provided entity's data into an ANS-102 data item, and
  * adds the necessary tags to decrypt it later on.
  */
-export async function createEncryptedEntityDataItem(
-  entity: Entity,
+export async function createEncryptedEntityDataItem<T>(
+  entity: Entity<T>,
   bundler: ArweaveBundler,
   itemAttributes: TransactionAttributes,
   cipher: CipherParams,
