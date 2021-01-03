@@ -1,7 +1,13 @@
 import Arweave from 'arweave';
+import { DataItemJson } from 'arweave-bundles';
 import { Exclude } from 'class-transformer';
-import { EntityTagMap, Transaction, TransactionAttributes } from 'src/utils';
-import { Cipher } from './enums';
+import {
+  ArweaveBundler,
+  DataItemAttributes,
+  Transaction,
+  TransactionAttributes,
+} from 'src/utils';
+import { Cipher, EntityTagMap } from './tags';
 
 export abstract class Entity {
   /** The id of the transaction that represents this entity. */
@@ -48,10 +54,10 @@ export abstract class Entity {
    *
    * Optionally specify a cipher and encryption key to encrypt this entity's data.
    */
-  /*abstract asDataItem(
-    arweaveBundler: ArweaveBundler,
-    txAttributes: TransactionAttributes,
+  abstract asDataItem(
+    bundler: ArweaveBundler,
+    itemAttributes: DataItemAttributes,
     cipher?: Cipher,
     encryptionKey?: CryptoKey,
-  ): Promise<Transaction>;*/
+  ): Promise<DataItemJson>;
 }

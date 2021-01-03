@@ -1,4 +1,5 @@
 import Arweave from 'arweave';
+import { DataItemJson } from 'arweave-bundles';
 import { Exclude, plainToClass } from 'class-transformer';
 import {
   IsEnum,
@@ -13,11 +14,14 @@ import {
   decryptEntityTransactionData,
 } from 'src/crypto';
 import {
+  addTagsToDataItem,
   addTagsToTx,
   arfsVersion,
+  ArweaveBundler,
   coerceToUtf8,
+  createUnencryptedEntityDataItem,
   createUnencryptedEntityDataTransaction,
-  EntityTagMap,
+  DataItemAttributes,
   formatTxUnixTime,
   parseUnixTimeTagToDate,
   Transaction,
@@ -29,8 +33,9 @@ import {
   DriveAuthMode,
   DrivePrivacy,
   EntityTag,
+  EntityTagMap,
   EntityType,
-} from './enums';
+} from './tags';
 
 export class DriveEntity extends Entity implements DriveEntityTransactionData {
   /**
@@ -164,6 +169,22 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
     addTagsToTx(tx, this.getEntityTransactionTags());
 
     return tx;
+  }
+
+  async asDataItem(
+    bundler: ArweaveBundler,
+    itemAttributes: DataItemAttributes,
+    cipher?: Cipher,
+    driveKey?: CryptoKey,
+  ): Promise<DataItemJson> {
+    const item =
+      cipher && driveKey
+        ? null!
+        : await createUnencryptedEntityDataItem(this, bundler, itemAttributes);
+
+    addTagsToDataItem(item, this.getEntityTransactionTags(), bundler);
+
+    return item;
   }
 }
 

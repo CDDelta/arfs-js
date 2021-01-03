@@ -19,6 +19,8 @@ export enum EntityTag {
   ContentType = 'Content-Type',
 }
 
+export type EntityTagMap = { [key in EntityTag]?: string };
+
 /** The valid values for the `Entity-Type` tag on all entity transactions. */
 export enum EntityType {
   Drive = 'drive',

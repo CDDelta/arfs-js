@@ -1,4 +1,5 @@
 import Arweave from 'arweave';
+import { DataItemJson } from 'arweave-bundles';
 import { Exclude, plainToClass } from 'class-transformer';
 import {
   IsDate,
@@ -16,18 +17,21 @@ import {
   deriveFileKey,
 } from 'src/crypto';
 import {
+  addTagsToDataItem,
   addTagsToTx,
   arfsVersion,
+  ArweaveBundler,
   coerceToUtf8,
+  createUnencryptedEntityDataItem,
   createUnencryptedEntityDataTransaction,
-  EntityTagMap,
+  DataItemAttributes,
   formatTxUnixTime,
   parseUnixTimeTagToDate,
   Transaction,
   TransactionAttributes,
 } from 'src/utils';
 import { Entity } from './entity';
-import { Cipher, EntityTag, EntityType } from './enums';
+import { Cipher, EntityTag, EntityTagMap, EntityType } from './tags';
 
 export class FileEntity extends Entity implements FileEntityTransactionData {
   /**
@@ -182,6 +186,22 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
     addTagsToTx(tx, this.getEntityTransactionTags());
 
     return tx;
+  }
+
+  async asDataItem(
+    bundler: ArweaveBundler,
+    itemAttributes: DataItemAttributes,
+    cipher?: Cipher,
+    driveKey?: CryptoKey,
+  ): Promise<DataItemJson> {
+    const item =
+      cipher && driveKey
+        ? null!
+        : await createUnencryptedEntityDataItem(this, bundler, itemAttributes);
+
+    addTagsToDataItem(item, this.getEntityTransactionTags(), bundler);
+
+    return item;
   }
 }
 
