@@ -25,7 +25,9 @@ import {
 import { Entity } from './entity';
 import { Cipher, EntityTag, EntityTagMap, EntityType } from './tags';
 
-export class FileEntity extends Entity implements FileEntityTransactionData {
+export class FileEntity
+  extends Entity<FileEntity>
+  implements FileEntityTransactionData {
   /**
    * The unique, persistent id of this file.
    *
@@ -89,24 +91,6 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
   @IsString()
   @IsNotEmpty()
   dataContentType?: string;
-
-  constructor(
-    properties: Omit<FileEntity, keyof Omit<Entity, 'createdAt'>>,
-    validate = true,
-  ) {
-    super();
-
-    // Workaround for class-transformer using the constructor.
-    if (!properties) {
-      return;
-    }
-
-    Object.assign(this, properties);
-
-    if (validate) {
-      validateOrReject(this);
-    }
-  }
 
   /**
    * Decodes the provided parameters into a file entity class.

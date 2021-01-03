@@ -17,7 +17,7 @@ import { Entity } from './entity';
 import { EntityTag, EntityTagMap, EntityType } from './tags';
 
 export class FolderEntity
-  extends Entity
+  extends Entity<FolderEntity>
   implements FolderEntityTransactionData {
   /**
    * The unique, persistent id of this folder.
@@ -55,24 +55,6 @@ export class FolderEntity
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  constructor(
-    properties: Omit<FolderEntity, keyof Omit<Entity, 'createdAt'>>,
-    validate = true,
-  ) {
-    super();
-
-    // Workaround for class-transformer using the constructor.
-    if (!properties) {
-      return;
-    }
-
-    Object.assign(this, properties);
-
-    if (validate) {
-      validateOrReject(this);
-    }
-  }
 
   /**
    * Decodes the provided parameters into a folder entity class.

@@ -23,7 +23,9 @@ import {
   EntityType,
 } from './tags';
 
-export class DriveEntity extends Entity implements DriveEntityTransactionData {
+export class DriveEntity
+  extends Entity<DriveEntity>
+  implements DriveEntityTransactionData {
   /**
    * The unique, persistent id of this drive.
    *
@@ -64,24 +66,6 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
   @IsNotEmpty()
   @IsUUID()
   rootFolderId: string;
-
-  constructor(
-    properties: Omit<DriveEntity, keyof Omit<Entity, 'createdAt'>>,
-    validate = true,
-  ) {
-    super();
-
-    // Workaround for class-transformer using the constructor.
-    if (!properties) {
-      return;
-    }
-
-    Object.assign(this, properties);
-
-    if (validate) {
-      validateOrReject(this);
-    }
-  }
 
   /**
    * Decodes the provided parameters into a drive entity class.

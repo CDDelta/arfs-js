@@ -1,6 +1,7 @@
 import Arweave from 'arweave';
 import { DataItemJson } from 'arweave-bundles';
 import { Exclude } from 'class-transformer';
+import { validateOrReject } from 'class-validator';
 import {
   createEncryptedEntityDataItem,
   createEncryptedEntityTransaction,
@@ -17,7 +18,7 @@ import {
 } from 'src/utils';
 import { Cipher, EntityTagMap } from './tags';
 
-export abstract class Entity {
+export abstract class Entity<T> {
   /** The id of the transaction that represents this entity. */
   @Exclude({ toPlainOnly: true })
   transactionId: string;
@@ -33,6 +34,22 @@ export abstract class Entity {
    */
   @Exclude({ toPlainOnly: true })
   createdAt: Date;
+
+  constructor(
+    properties: Omit<T, keyof Omit<Entity<T>, 'createdAt'>>,
+    validate = true,
+  ) {
+    // Workaround for class-transformer using the constructor.
+    if (!properties) {
+      return;
+    }
+
+    Object.assign(this, properties);
+
+    if (validate) {
+      validateOrReject(this);
+    }
+  }
 
   /**
    * Returns the tags that should be included when creating a transaction that represents
