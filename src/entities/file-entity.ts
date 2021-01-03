@@ -173,9 +173,6 @@ export class FileEntity
 export interface FileEntityTransactionData {
   name: string;
   size: number;
-  /**
-   * Represented in milliseconds since Unix epoch
-   */
   lastModifiedDate: Date;
   dataTxId: string;
   dataContentType?: string;
