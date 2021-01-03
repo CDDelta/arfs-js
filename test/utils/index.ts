@@ -1,6 +1,7 @@
 import Arweave from 'arweave';
 import { b64UrlToString } from 'arweave/node/lib/utils';
-import { EntityTagMap, getSubtleCrypto } from '../../src/utils';
+import { EntityTagMap } from 'src';
+import { getSubtleCrypto } from '../../src/utils';
 
 export function getArweaveClient(): Arweave {
   return Arweave.init({
