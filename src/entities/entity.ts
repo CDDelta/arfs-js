@@ -31,7 +31,7 @@ export abstract class Entity {
   protected abstract getEntityTransactionTags(): EntityTagMap;
 
   /**
-   * Converts this entity into a transaction that can be submitted to Arweave.
+   * Converts this entity into an unsigned transaction that can be submitted to Arweave.
    *
    * Optionally specify a cipher and encryption key to encrypt this entity's data.
    */
@@ -43,7 +43,7 @@ export abstract class Entity {
   ): Promise<Transaction>;
 
   /**
-   * Converts this entity into a data item that can be included as part of an ANS-102
+   * Converts this entity into an unsigned data item that can be included as part of an ANS-102
    * data bundle.
    *
    * Optionally specify a cipher and encryption key to encrypt this entity's data.
