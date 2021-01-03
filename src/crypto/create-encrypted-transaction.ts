@@ -19,7 +19,7 @@ let utf8Encoder: TextEncoder;
 export async function createEncryptedEntityTransaction(
   entity: Entity,
   arweave: Arweave,
-  txAttributes: Partial<TransactionAttributes>,
+  txAttributes: TransactionAttributes,
   cipher: CipherParams,
 ): Promise<Transaction> {
   // Lazily create the TextEncoder.
@@ -37,7 +37,7 @@ export async function createEncryptedEntityTransaction(
 export async function createEncryptedTransaction(
   data: ArrayBuffer,
   arweave: Arweave,
-  txAttributes: Partial<TransactionAttributes>,
+  txAttributes: TransactionAttributes,
   cipher: CipherParams,
 ): Promise<Transaction> {
   const subtleCrypto = getSubtleCrypto();

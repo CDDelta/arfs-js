@@ -41,7 +41,7 @@ export function parseUnixTimeTagToDate(tagValue?: string): Date | null {
 export async function createUnencryptedEntityDataTransaction(
   entity: Entity,
   arweave: Arweave,
-  txAttributes: Partial<TransactionAttributes>,
+  txAttributes: TransactionAttributes,
 ): Promise<Transaction> {
   const tx = await arweave.createTransaction({
     ...txAttributes,

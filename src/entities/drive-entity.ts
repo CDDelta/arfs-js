@@ -145,7 +145,7 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
 
   async asTransaction(
     arweave: Arweave,
-    txAttributes: Partial<TransactionAttributes>,
+    txAttributes: TransactionAttributes,
     cipher?: Cipher,
     driveKey?: CryptoKey,
   ): Promise<Transaction> {

@@ -136,7 +136,7 @@ export class FolderEntity
 
   async asTransaction(
     arweave: Arweave,
-    txAttributes: Partial<TransactionAttributes>,
+    txAttributes: TransactionAttributes,
     cipher?: Cipher,
     driveKey?: CryptoKey,
   ): Promise<Transaction> {

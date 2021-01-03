@@ -16,9 +16,9 @@ export interface Transaction {
  */
 export interface TransactionAttributes {
   owner: string;
-  target: string;
-  quantity: string;
-  reward: string;
+  target?: string;
+  quantity?: string;
+  reward?: string;
 }
 
 /**

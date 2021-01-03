@@ -163,7 +163,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
 
   async asTransaction(
     arweave: Arweave,
-    txAttributes: Partial<TransactionAttributes>,
+    txAttributes: TransactionAttributes,
     cipher?: Cipher,
     driveKey?: CryptoKey,
   ): Promise<Transaction> {
