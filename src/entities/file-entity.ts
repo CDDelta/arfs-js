@@ -16,12 +16,12 @@ import {
   deriveFileKey,
 } from 'src/crypto';
 import {
-  addArFSTagToTx,
   addTagsToTx,
-  addUnixTimestampTagToTx,
+  arfsVersion,
   coerceToUtf8,
   createUnencryptedEntityDataTransaction,
   EntityTagMap,
+  formatTxUnixTime,
   parseUnixTimeTagToDate,
   Transaction,
   TransactionAttributes,
@@ -150,6 +150,17 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
     return entity;
   }
 
+  protected getEntityTransactionTags(): EntityTagMap {
+    return {
+      ArFS: arfsVersion,
+      'Unix-Time': formatTxUnixTime(this.createdAt),
+      'Entity-Type': EntityType.File,
+      'File-Id': this.id,
+      'Drive-Id': this.driveId,
+      'Parent-Folder-Id': this.parentFolderId,
+    };
+  }
+
   async asTransaction(
     arweave: Arweave,
     txAttributes: Partial<TransactionAttributes>,
@@ -168,15 +179,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
             txAttributes,
           );
 
-    addArFSTagToTx(tx);
-    addUnixTimestampTagToTx(tx, this.createdAt);
-
-    addTagsToTx(tx, {
-      'Entity-Type': EntityType.File,
-      'File-Id': this.id,
-      'Drive-Id': this.driveId,
-      'Parent-Folder-Id': this.parentFolderId,
-    });
+    addTagsToTx(tx, this.getEntityTransactionTags());
 
     return tx;
   }

@@ -13,12 +13,12 @@ import {
   decryptEntityTransactionData,
 } from 'src/crypto';
 import {
-  addArFSTagToTx,
   addTagsToTx,
-  addUnixTimestampTagToTx,
+  arfsVersion,
   coerceToUtf8,
   createUnencryptedEntityDataTransaction,
   EntityTagMap,
+  formatTxUnixTime,
   parseUnixTimeTagToDate,
   Transaction,
   TransactionAttributes,
@@ -129,6 +129,20 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
     return entity;
   }
 
+  protected getEntityTransactionTags(): EntityTagMap {
+    const tags: EntityTagMap = {
+      ArFS: arfsVersion,
+      'Unix-Time': formatTxUnixTime(this.createdAt),
+      'Entity-Type': EntityType.Drive,
+      'Drive-Id': this.id,
+      'Drive-Privacy': this.privacy,
+    };
+
+    tags['Drive-Auth-Mode'] ||= this.authMode;
+
+    return tags;
+  }
+
   async asTransaction(
     arweave: Arweave,
     txAttributes: Partial<TransactionAttributes>,
@@ -147,20 +161,7 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
             txAttributes,
           );
 
-    addArFSTagToTx(tx);
-    addUnixTimestampTagToTx(tx, this.createdAt);
-
-    addTagsToTx(tx, {
-      'Entity-Type': EntityType.Drive,
-      'Drive-Id': this.id,
-      'Drive-Privacy': this.privacy,
-    });
-
-    if (this.authMode) {
-      addTagsToTx(tx, {
-        'Drive-Auth-Mode': this.authMode,
-      });
-    }
+    addTagsToTx(tx, this.getEntityTransactionTags());
 
     return tx;
   }

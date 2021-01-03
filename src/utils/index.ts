@@ -22,25 +22,12 @@ export function addTagsToTx(tx: Transaction, tags: EntityTagMap) {
   }
 }
 
-/**
- * Adds the latest ArFS tag to the transaction.
- */
-export function addArFSTagToTx(tx: Transaction): void {
-  addTagsToTx(tx, {
-    ArFS: '0.11',
-  });
-}
+/** The ArFS version the entities in this library are created with. */
+export const arfsVersion = '0.11';
 
-/**
- * Timestamps the transaction with the current unix time in seconds by adding a `Unix-Time tag.
- */
-export function addUnixTimestampTagToTx(
-  tx: Transaction,
-  timestamp: Date,
-): void {
-  addTagsToTx(tx, {
-    'Unix-Time': (timestamp.valueOf() / 1000).toString(),
-  });
+/** Formats the provided timestamp for the `Unix-Time` tag on an ArFS transaction. */
+export function formatTxUnixTime(timestamp: Date) {
+  return (timestamp.valueOf() / 1000).toString();
 }
 
 export function parseUnixTimeTagToDate(tagValue?: string): Date | null {

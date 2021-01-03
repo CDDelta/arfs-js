@@ -12,12 +12,12 @@ import {
   decryptEntityTransactionData,
 } from 'src/crypto';
 import {
-  addArFSTagToTx,
   addTagsToTx,
-  addUnixTimestampTagToTx,
+  arfsVersion,
   coerceToUtf8,
   createUnencryptedEntityDataTransaction,
   EntityTagMap,
+  formatTxUnixTime,
   parseUnixTimeTagToDate,
   Transaction,
   TransactionAttributes,
@@ -59,7 +59,7 @@ export class FolderEntity
   @IsOptional()
   @IsString()
   @Exclude({ toPlainOnly: true })
-  parentFolderId: string | null;
+  parentFolderId?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -120,6 +120,20 @@ export class FolderEntity
     return entity;
   }
 
+  protected getEntityTransactionTags(): EntityTagMap {
+    const tags: EntityTagMap = {
+      ArFS: arfsVersion,
+      'Unix-Time': formatTxUnixTime(this.createdAt),
+      'Entity-Type': EntityType.Folder,
+      'Folder-Id': this.id,
+      'Drive-Id': this.driveId,
+    };
+
+    tags['Parent-Folder-Id'] ||= this.parentFolderId;
+
+    return tags;
+  }
+
   async asTransaction(
     arweave: Arweave,
     txAttributes: Partial<TransactionAttributes>,
@@ -138,20 +152,7 @@ export class FolderEntity
             txAttributes,
           );
 
-    addArFSTagToTx(tx);
-    addUnixTimestampTagToTx(tx, this.createdAt);
-
-    const tags: EntityTagMap = {
-      'Entity-Type': EntityType.Folder,
-      'Folder-Id': this.id,
-      'Drive-Id': this.driveId,
-    };
-
-    if (this.parentFolderId) {
-      tags['Parent-Folder-Id'] = this.parentFolderId;
-    }
-
-    addTagsToTx(tx, tags);
+    addTagsToTx(tx, this.getEntityTransactionTags());
 
     return tx;
   }
