@@ -1,18 +1,11 @@
 import Arweave from 'arweave';
-import { TransactionInterface } from 'arweave/node/lib/transaction';
 import { classToPlain } from 'class-transformer';
 import * as crypto from 'crypto';
 import { ContentType, Entity, EntityTag } from 'src/entities';
 import { TextDecoder } from 'util';
+import { Transaction, TransactionAttributes } from './interfaces';
 
-/** Temporary Arweave transaction mock */
-export interface Transaction {
-  id: string;
-  owner: string;
-  tags: { name: string; value: string }[];
-  data: Uint8Array;
-  addTag(name: string, value: string): void;
-}
+export * from './interfaces';
 
 export type EntityTagMap = { [key in EntityTag]?: string };
 
@@ -61,7 +54,7 @@ export function parseUnixTimeTagToDate(tagValue?: string): Date | null {
 export async function createUnencryptedEntityDataTransaction(
   entity: Entity,
   arweave: Arweave,
-  txAttributes: Partial<TransactionInterface>,
+  txAttributes: Partial<TransactionAttributes>,
 ): Promise<Transaction> {
   const tx = await arweave.createTransaction({
     ...txAttributes,

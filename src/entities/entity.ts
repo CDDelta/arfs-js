@@ -1,7 +1,6 @@
 import Arweave from 'arweave';
-import { TransactionInterface } from 'arweave/node/lib/transaction';
 import { Exclude } from 'class-transformer';
-import { Transaction } from 'src/utils';
+import { Transaction, TransactionAttributes } from 'src/utils';
 import { Cipher } from './enums';
 
 export abstract class Entity {
@@ -28,7 +27,7 @@ export abstract class Entity {
    */
   abstract asTransaction(
     arweave: Arweave,
-    txAttributes: Partial<TransactionInterface>,
+    txAttributes: Partial<TransactionAttributes>,
     cipher: Cipher | null,
     encryptionKey: CryptoKey | null,
   ): Promise<Transaction>;

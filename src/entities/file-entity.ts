@@ -1,5 +1,4 @@
 import Arweave from 'arweave';
-import { TransactionInterface } from 'arweave/node/lib/transaction';
 import { Exclude, plainToClass } from 'class-transformer';
 import {
   IsDate,
@@ -25,6 +24,7 @@ import {
   EntityTagMap,
   parseUnixTimeTagToDate,
   Transaction,
+  TransactionAttributes,
 } from 'src/utils';
 import { Entity } from './entity';
 import { Cipher, EntityTag, EntityType } from './enums';
@@ -152,7 +152,7 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
 
   async asTransaction(
     arweave: Arweave,
-    txAttributes: Partial<TransactionInterface>,
+    txAttributes: Partial<TransactionAttributes>,
     cipher: Cipher | null = null,
     driveKey: CryptoKey | null = null,
   ): Promise<Transaction> {

@@ -1,10 +1,14 @@
 import Arweave from 'arweave';
-import { TransactionInterface } from 'arweave/node/lib/transaction';
 import { bufferTob64Url } from 'arweave/node/lib/utils';
 import { classToPlain } from 'class-transformer';
 import { randomBytes } from 'crypto';
 import { Cipher, ContentType, Entity } from 'src/entities';
-import { addTagsToTx, getSubtleCrypto, Transaction } from 'src/utils';
+import {
+  addTagsToTx,
+  getSubtleCrypto,
+  Transaction,
+  TransactionAttributes,
+} from 'src/utils';
 
 let utf8Encoder: TextEncoder;
 
@@ -15,7 +19,7 @@ let utf8Encoder: TextEncoder;
 export async function createEncryptedEntityTransaction(
   entity: Entity,
   arweave: Arweave,
-  txAttributes: Partial<TransactionInterface>,
+  txAttributes: Partial<TransactionAttributes>,
   cipher: CipherParams,
 ): Promise<Transaction> {
   // Lazily create the TextEncoder.
@@ -33,7 +37,7 @@ export async function createEncryptedEntityTransaction(
 export async function createEncryptedTransaction(
   data: ArrayBuffer,
   arweave: Arweave,
-  txAttributes: Partial<TransactionInterface>,
+  txAttributes: Partial<TransactionAttributes>,
   cipher: CipherParams,
 ): Promise<Transaction> {
   const subtleCrypto = getSubtleCrypto();
