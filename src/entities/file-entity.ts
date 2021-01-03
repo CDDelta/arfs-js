@@ -12,6 +12,7 @@ import {
   validateOrReject,
 } from 'class-validator';
 import {
+  createEncryptedEntityDataItem,
   createEncryptedEntityTransaction,
   decryptEntityTransactionData,
   deriveFileKey,
@@ -196,7 +197,10 @@ export class FileEntity extends Entity implements FileEntityTransactionData {
   ): Promise<DataItemJson> {
     const item =
       cipher && driveKey
-        ? null!
+        ? await createEncryptedEntityDataItem(this, bundler, itemAttributes, {
+            name: cipher,
+            key: await deriveFileKey(driveKey, this.id),
+          })
         : await createUnencryptedEntityDataItem(this, bundler, itemAttributes);
 
     addTagsToDataItem(item, this.getEntityTransactionTags(), bundler);

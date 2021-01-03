@@ -51,6 +51,8 @@ export async function createUnencryptedEntityDataItem(
         },
       ],
     },
-    {} as any,
+    {
+      n: itemAttributes.owner,
+    } as any,
   );
 }

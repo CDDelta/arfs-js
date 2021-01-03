@@ -1,6 +1,11 @@
-import { b64UrlToBuffer } from 'arweave/node/lib/utils';
+import { b64UrlToBuffer, b64UrlToString } from 'arweave/node/lib/utils';
 import { Cipher, FolderEntity } from '../../src';
-import { getArweaveClient, importAesGcmKey, tagListToMap } from '../utils';
+import {
+  getArweaveBundler,
+  getArweaveClient,
+  importAesGcmKey,
+  tagListToMap,
+} from '../utils';
 
 const arweave = getArweaveClient();
 
@@ -40,7 +45,7 @@ describe('FolderEntity', () => {
     });
   });
 
-  describe('asTransaction()', () => {
+  describe('creation', () => {
     beforeAll(() => {
       jest.useFakeTimers('modern');
       jest.setSystemTime(new Date('20 Aug 2020 00:12:00 GMT').getTime());
@@ -59,48 +64,96 @@ describe('FolderEntity', () => {
       createdAt: new Date(),
     });
 
-    test('can properly create public transaction', async () => {
-      entity.createdAt = new Date();
+    const testDriveKeyBytes = b64UrlToBuffer(
+      'K7jsNncKDgDBi_1xnNi9tigst4jQKeaBxrb0GAZMRYA',
+    );
 
-      const tx = await entity.asTransaction(arweave, {
-        owner: 'mock_owner',
+    describe('asTransaction()', () => {
+      test('can properly create public transaction', async () => {
+        entity.createdAt = new Date();
+
+        const tx = await entity.asTransaction(arweave, {
+          owner: 'mock_owner',
+        });
+
+        await expect(
+          FolderEntity.fromTransaction(
+            tx.id,
+            await arweave.wallets.ownerToAddress(tx.owner),
+            tagListToMap(tx.tags),
+            tx.data,
+          ),
+        ).resolves.toMatchObject(entity);
       });
 
-      await expect(
-        FolderEntity.fromTransaction(
-          tx.id,
-          await arweave.wallets.ownerToAddress(tx.owner),
-          tagListToMap(tx.tags),
-          tx.data,
-        ),
-      ).resolves.toMatchObject(entity);
+      test('can properly create private transaction', async () => {
+        entity.createdAt = new Date();
+        const testDriveKey = await importAesGcmKey(testDriveKeyBytes);
+
+        const tx = await entity.asTransaction(
+          arweave,
+          {
+            owner: 'mock_owner',
+          },
+          Cipher.AES256GCM,
+          testDriveKey,
+        );
+
+        await expect(
+          FolderEntity.fromTransaction(
+            tx.id,
+            await arweave.wallets.ownerToAddress(tx.owner),
+            tagListToMap(tx.tags),
+            tx.data,
+            testDriveKey,
+          ),
+        ).resolves.toMatchObject(entity);
+      });
     });
 
-    test('can properly create private transaction', async () => {
-      entity.createdAt = new Date();
+    describe('asDataItem()', () => {
+      const bundler = getArweaveBundler();
 
-      const driveKey = await importAesGcmKey(
-        b64UrlToBuffer('K7jsNncKDgDBi_1xnNi9tigst4jQKeaBxrb0GAZMRYA'),
-      );
+      test('can properly create public data item', async () => {
+        entity.createdAt = new Date();
 
-      const tx = await entity.asTransaction(
-        arweave,
-        {
+        const item = await entity.asDataItem(bundler, {
           owner: 'mock_owner',
-        },
-        Cipher.AES256GCM,
-        driveKey,
-      );
+        });
 
-      await expect(
-        FolderEntity.fromTransaction(
-          tx.id,
-          await arweave.wallets.ownerToAddress(tx.owner),
-          tagListToMap(tx.tags),
-          tx.data,
-          driveKey,
-        ),
-      ).resolves.toMatchObject(entity);
+        await expect(
+          FolderEntity.fromTransaction(
+            item.id,
+            await arweave.wallets.ownerToAddress(item.owner),
+            tagListToMap(item.tags),
+            b64UrlToString(item.data),
+          ),
+        ).resolves.toMatchObject(entity);
+      });
+
+      test('can properly create private data item', async () => {
+        entity.createdAt = new Date();
+        const testDriveKey = await importAesGcmKey(testDriveKeyBytes);
+
+        const item = await entity.asDataItem(
+          bundler,
+          {
+            owner: 'mock_owner',
+          },
+          Cipher.AES256GCM,
+          testDriveKey,
+        );
+
+        await expect(
+          FolderEntity.fromTransaction(
+            item.id,
+            await arweave.wallets.ownerToAddress(item.owner),
+            tagListToMap(item.tags),
+            b64UrlToBuffer(item.data),
+            testDriveKey,
+          ),
+        ).resolves.toMatchObject(entity);
+      });
     });
   });
 });

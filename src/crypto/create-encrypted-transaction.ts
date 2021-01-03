@@ -1,10 +1,13 @@
 import Arweave from 'arweave';
+import { DataItemJson } from 'arweave-bundles';
 import { bufferTob64Url } from 'arweave/node/lib/utils';
 import { classToPlain } from 'class-transformer';
 import { randomBytes } from 'crypto';
-import { Cipher, ContentType, Entity } from 'src/entities';
+import { Cipher, ContentType, Entity, EntityTagMap } from 'src/entities';
 import {
+  addTagsToDataItem,
   addTagsToTx,
+  ArweaveBundler,
   getSubtleCrypto,
   Transaction,
   TransactionAttributes,
@@ -13,7 +16,7 @@ import {
 let utf8Encoder: TextEncoder;
 
 /**
- * Encrypts the provided entity's data, sets it on the specified transaction, and
+ * Encrypts the provided entity's data into an Arweave transaction, and
  * adds the necessary tags to decrypt it later on.
  */
 export async function createEncryptedEntityTransaction(
@@ -31,7 +34,7 @@ export async function createEncryptedEntityTransaction(
 }
 
 /**
- * Encrypts the provided data, sets it on the specified transaction, and
+ * Encrypts the provided data into an Arweave transaction, and
  * adds the necessary tags to decrypt it later on.
  */
 export async function createEncryptedTransaction(
@@ -40,6 +43,64 @@ export async function createEncryptedTransaction(
   txAttributes: TransactionAttributes,
   cipher: CipherParams,
 ): Promise<Transaction> {
+  const res = await encryptDataForTransaction(data, cipher);
+
+  const tx = await arweave.createTransaction({
+    ...txAttributes,
+    data: res.data,
+  });
+
+  addTagsToTx(tx, res.encryptionTags);
+
+  return tx;
+}
+
+/**
+ * Encrypts the provided entity's data into an ANS-102 data item, and
+ * adds the necessary tags to decrypt it later on.
+ */
+export async function createEncryptedEntityDataItem(
+  entity: Entity,
+  bundler: ArweaveBundler,
+  itemAttributes: TransactionAttributes,
+  cipher: CipherParams,
+): Promise<DataItemJson> {
+  // Lazily create the TextEncoder.
+  utf8Encoder ||= new TextEncoder();
+
+  const encodedData = utf8Encoder.encode(JSON.stringify(classToPlain(entity)));
+
+  const res = await encryptDataForTransaction(encodedData, cipher);
+
+  const item = await bundler.createData(
+    {
+      ...itemAttributes,
+      data: new Uint8Array(res.data),
+    },
+    {
+      n: itemAttributes.owner,
+    } as any,
+  );
+
+  addTagsToDataItem(item, res.encryptionTags, bundler);
+
+  return item;
+}
+
+export interface CipherParams {
+  name: Cipher;
+  key: CryptoKey;
+}
+
+interface TransactionEncryptionResult {
+  data: ArrayBuffer;
+  encryptionTags: EntityTagMap;
+}
+
+async function encryptDataForTransaction(
+  data: ArrayBuffer,
+  cipher: CipherParams,
+): Promise<TransactionEncryptionResult> {
   const subtleCrypto = getSubtleCrypto();
 
   let cryptoAlgo: Algorithm;
@@ -60,30 +121,21 @@ export async function createEncryptedTransaction(
     data,
   );
 
-  const tx = await arweave.createTransaction({
-    ...txAttributes,
-    data: encryptedData,
-  });
+  const tags: EntityTagMap = {};
 
   switch (cipher.name) {
     case Cipher.AES256GCM:
-      addTagsToTx(tx, {
-        'Cipher-IV': bufferTob64Url(
-          (cryptoAlgo as AesGcmParams).iv as Uint8Array,
-        ),
-      });
+      tags['Cipher-IV'] = bufferTob64Url(
+        (cryptoAlgo as AesGcmParams).iv as Uint8Array,
+      );
       break;
   }
 
-  addTagsToTx(tx, {
-    Cipher: cipher.name,
-    'Content-Type': ContentType.OctetStream,
-  });
+  tags.Cipher = cipher.name;
+  tags['Content-Type'] = ContentType.OctetStream;
 
-  return tx;
-}
-
-export interface CipherParams {
-  name: Cipher;
-  key: CryptoKey;
+  return {
+    data: encryptedData,
+    encryptionTags: tags,
+  };
 }

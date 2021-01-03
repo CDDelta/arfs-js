@@ -9,6 +9,7 @@ import {
   validateOrReject,
 } from 'class-validator';
 import {
+  createEncryptedEntityDataItem,
   createEncryptedEntityTransaction,
   decryptEntityTransactionData,
 } from 'src/crypto';
@@ -169,7 +170,10 @@ export class FolderEntity
   ): Promise<DataItemJson> {
     const item =
       cipher && driveKey
-        ? null!
+        ? await createEncryptedEntityDataItem(this, bundler, itemAttributes, {
+            name: cipher,
+            key: driveKey,
+          })
         : await createUnencryptedEntityDataItem(this, bundler, itemAttributes);
 
     addTagsToDataItem(item, this.getEntityTransactionTags(), bundler);

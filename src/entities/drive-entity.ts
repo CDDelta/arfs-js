@@ -10,6 +10,7 @@ import {
   validateOrReject,
 } from 'class-validator';
 import {
+  createEncryptedEntityDataItem,
   createEncryptedEntityTransaction,
   decryptEntityTransactionData,
 } from 'src/crypto';
@@ -102,7 +103,8 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
    *
    * Throws an error if the provided parameters form an invalid drive entity.
    *
-   * @param txData expected to be of type `ArrayBuffer` if the entity is encrypted.
+   * @param txData expected to be JSON if the entity is public,
+   * of type `ArrayBuffer` if the entity is private/encrypted.
    */
   static async fromTransaction(
     txId: string,
@@ -179,7 +181,10 @@ export class DriveEntity extends Entity implements DriveEntityTransactionData {
   ): Promise<DataItemJson> {
     const item =
       cipher && driveKey
-        ? null!
+        ? await createEncryptedEntityDataItem(this, bundler, itemAttributes, {
+            name: cipher,
+            key: driveKey,
+          })
         : await createUnencryptedEntityDataItem(this, bundler, itemAttributes);
 
     addTagsToDataItem(item, this.getEntityTransactionTags(), bundler);
