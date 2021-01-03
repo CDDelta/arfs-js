@@ -23,7 +23,7 @@ export abstract class Entity<T> {
   @Exclude({ toPlainOnly: true })
   transactionId: string;
 
-  /** The address of the transaction owner that represents this entity. */
+  /** The address of the owner of the transaction that represents this entity. */
   @Exclude({ toPlainOnly: true })
   transactionOwnerAddress: string;
 
