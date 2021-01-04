@@ -1,6 +1,10 @@
 {
   "name": "arfs",
-  "version": "0.3.0",
+  "version": "0.3.1",
+  "keywords": [
+    "arweave",
+    "typescript"
+  ],
   "scripts": {
     "build": "tsc  -p tsconfig.build.json",
     "test": "npx jest --coverage",
