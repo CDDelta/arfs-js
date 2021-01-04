@@ -6,13 +6,13 @@ import {
   IsUUID,
   validateOrReject,
 } from 'class-validator';
-import { decryptEntityTransactionData } from 'src/crypto';
+import { decryptEntityTransactionData } from '../crypto';
 import {
   arfsVersion,
   coerceToUtf8,
   formatTxUnixTime,
   parseUnixTimeTagToDate,
-} from 'src/utils';
+} from '../utils';
 import { Entity } from './entity';
 import { EntityTag, EntityTagMap, EntityType } from './tags';
 

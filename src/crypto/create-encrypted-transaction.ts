@@ -3,15 +3,15 @@ import { DataItemJson } from 'arweave-bundles';
 import { bufferTob64Url } from 'arweave/node/lib/utils';
 import { classToPlain } from 'class-transformer';
 import { randomBytes } from 'crypto';
-import { Cipher, ContentType, Entity, EntityTagMap } from 'src/entities';
+import { Cipher, ContentType, Entity, EntityTagMap } from '../entities';
 import {
   addTagsToDataItem,
   addTagsToTx,
   ArweaveBundler,
   getSubtleCrypto,
   Transaction,
-  TransactionAttributes,
-} from 'src/utils';
+  TransactionAttributes
+} from '../utils';
 
 let utf8Encoder: TextEncoder;
 

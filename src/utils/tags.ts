@@ -1,5 +1,5 @@
 import { DataItemJson } from 'arweave-bundles';
-import { EntityTagMap } from 'src/entities';
+import { EntityTagMap } from '../entities';
 import { ArweaveBundler, Transaction } from './interfaces';
 
 /**

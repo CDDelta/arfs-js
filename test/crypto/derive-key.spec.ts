@@ -1,6 +1,11 @@
 import { b64UrlToBuffer, bufferTob64Url } from 'arweave/node/lib/utils';
-import { Cipher, deriveDriveKey, deriveFileKey, DriveAuthMode } from 'src';
-import { getSubtleCrypto } from 'src/utils';
+import {
+  Cipher,
+  deriveDriveKey,
+  deriveFileKey,
+  DriveAuthMode,
+} from '../../src';
+import { getSubtleCrypto } from '../../src/utils';
 import testKey from '../fixtures/test-key.json';
 import { importAesGcmKey } from '../utils';
 

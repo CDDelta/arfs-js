@@ -2,7 +2,7 @@ import Arweave from 'arweave';
 import ArweaveBundles from 'arweave-bundles';
 import deepHash from 'arweave/node/lib/deepHash';
 import { b64UrlToString } from 'arweave/node/lib/utils';
-import { EntityTagMap } from 'src';
+import { EntityTagMap } from '../../src';
 import { ArweaveBundler, getSubtleCrypto } from '../../src/utils';
 
 export function getArweaveClient(): Arweave {

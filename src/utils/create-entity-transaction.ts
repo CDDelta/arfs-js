@@ -2,7 +2,7 @@ import Arweave from 'arweave';
 import { DataItemJson } from 'arweave-bundles';
 import Transaction from 'arweave/node/lib/transaction';
 import { classToPlain } from 'class-transformer';
-import { ContentType, Entity, EntityTag } from 'src/entities';
+import { ContentType, Entity, EntityTag } from '../entities';
 import {
   ArweaveBundler,
   DataItemAttributes,

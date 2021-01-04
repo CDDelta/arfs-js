@@ -1,5 +1,5 @@
 import { b64UrlToBuffer, b64UrlToString } from 'arweave/node/lib/utils';
-import { Cipher, DriveEntity, DrivePrivacy } from 'src';
+import { Cipher, DriveEntity, DrivePrivacy } from '../../src';
 import {
   getArweaveBundler,
   getArweaveClient,

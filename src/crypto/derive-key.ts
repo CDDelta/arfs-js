@@ -1,7 +1,7 @@
-import { Cipher, DriveAuthMode } from 'src/entities';
-import { getSubtleCrypto } from 'src/utils';
 import { TextEncoder } from 'util';
 import { parse as uuidParse } from 'uuid';
+import { Cipher, DriveAuthMode } from '../entities';
+import { getSubtleCrypto } from '../utils';
 
 let utf8Encoder: TextEncoder;
 

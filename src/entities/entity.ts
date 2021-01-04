@@ -5,7 +5,7 @@ import { validateOrReject } from 'class-validator';
 import {
   createEncryptedEntityDataItem,
   createEncryptedEntityTransaction,
-} from 'src/crypto';
+} from '../crypto';
 import {
   addTagsToDataItem,
   addTagsToTx,
@@ -15,7 +15,7 @@ import {
   DataItemAttributes,
   Transaction,
   TransactionAttributes,
-} from 'src/utils';
+} from '../utils';
 import { Cipher, EntityTagMap } from './tags';
 
 export abstract class Entity<T extends Entity<T> = any> {

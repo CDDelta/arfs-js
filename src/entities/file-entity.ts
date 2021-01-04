@@ -11,7 +11,7 @@ import {
   IsUUID,
   validateOrReject,
 } from 'class-validator';
-import { decryptEntityTransactionData, deriveFileKey } from 'src/crypto';
+import { decryptEntityTransactionData, deriveFileKey } from '../crypto';
 import {
   arfsVersion,
   ArweaveBundler,
@@ -21,7 +21,7 @@ import {
   parseUnixTimeTagToDate,
   Transaction,
   TransactionAttributes,
-} from 'src/utils';
+} from '../utils';
 import { Entity } from './entity';
 import { Cipher, EntityTag, EntityTagMap, EntityType } from './tags';
 

@@ -1,7 +1,7 @@
 import { b64UrlToBuffer } from 'arweave/node/lib/utils';
-import { Cipher, EntityTag, EntityTagMap } from 'src/entities';
-import { getSubtleCrypto } from 'src/utils';
 import { TextDecoder } from 'util';
+import { Cipher, EntityTag, EntityTagMap } from '../entities';
+import { getSubtleCrypto } from '../utils';
 
 let utf8Decoder: TextDecoder;
 

@@ -1,5 +1,5 @@
 import { b64UrlToBuffer, b64UrlToString } from 'arweave/node/lib/utils';
-import { Cipher, FileEntity } from 'src';
+import { Cipher, FileEntity } from '../../src';
 import {
   getArweaveBundler,
   getArweaveClient,
