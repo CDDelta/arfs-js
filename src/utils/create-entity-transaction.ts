@@ -14,8 +14,8 @@ import { addTagsToTx } from './tags';
  * Creates a transaction with the provided entity's data unencrypted and encoded as JSON,
  * including the appropriate `Content-Type` tag.
  */
-export async function createUnencryptedEntityDataTransaction<T>(
-  entity: Entity<T>,
+export async function createUnencryptedEntityDataTransaction(
+  entity: Entity,
   arweave: Arweave,
   txAttributes: TransactionAttributes,
 ): Promise<Transaction> {
@@ -35,8 +35,8 @@ export async function createUnencryptedEntityDataTransaction<T>(
  * Creates a transaction with the provided entity's data unencrypted and encoded as JSON,
  * including the appropriate `Content-Type` tag.
  */
-export async function createUnencryptedEntityDataItem<T>(
-  entity: Entity<T>,
+export async function createUnencryptedEntityDataItem(
+  entity: Entity,
   bundler: ArweaveBundler,
   itemAttributes: DataItemAttributes,
 ): Promise<DataItemJson> {

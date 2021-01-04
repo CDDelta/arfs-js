@@ -18,7 +18,7 @@ import {
 } from 'src/utils';
 import { Cipher, EntityTagMap } from './tags';
 
-export abstract class Entity<T> {
+export abstract class Entity<T extends Entity<T> = any> {
   /** The id of the transaction that represents this entity. */
   @Exclude({ toPlainOnly: true })
   transactionId: string;
