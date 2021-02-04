@@ -1,5 +1,3 @@
-import Arweave from 'arweave';
-import { DataItemJson } from 'arweave-bundles';
 import { Exclude, plainToClass } from 'class-transformer';
 import {
   IsDate,
@@ -11,19 +9,15 @@ import {
   IsUUID,
   validateOrReject,
 } from 'class-validator';
-import { decryptEntityTransactionData, deriveFileKey } from '../crypto';
+import { decryptEntityTransactionData } from '../crypto';
 import {
   arfsVersion,
-  ArweaveBundler,
   coerceToUtf8,
-  DataItemAttributes,
   formatTxUnixTime,
   parseUnixTimeTagToDate,
-  Transaction,
-  TransactionAttributes,
 } from '../utils';
 import { Entity } from './entity';
-import { Cipher, EntityTag, EntityTagMap, EntityType } from './tags';
+import { EntityTag, EntityTagMap, EntityType } from './tags';
 
 export class FileEntity
   extends Entity<FileEntity>
@@ -104,13 +98,13 @@ export class FileEntity
     txOwnerAddress: string,
     txTags: EntityTagMap,
     txData: string | ArrayBuffer,
-    driveKey?: CryptoKey,
+    encryptionKey?: CryptoKey,
   ): Promise<FileEntity> {
-    const entityTxData: FileEntityTransactionData = driveKey
+    const entityTxData: FileEntityTransactionData = encryptionKey
       ? await decryptEntityTransactionData(
           txData as ArrayBuffer,
           txTags,
-          await deriveFileKey(driveKey, txTags[EntityTag.FileId]!),
+          encryptionKey,
         )
       : JSON.parse(coerceToUtf8(txData));
 
@@ -139,34 +133,6 @@ export class FileEntity
       'Drive-Id': this.driveId,
       'Parent-Folder-Id': this.parentFolderId,
     };
-  }
-
-  async asTransaction(
-    arweave: Arweave,
-    txAttributes: TransactionAttributes,
-    cipher?: Cipher,
-    driveKey?: CryptoKey,
-  ): Promise<Transaction> {
-    return await super.asTransaction(
-      arweave,
-      txAttributes,
-      cipher,
-      driveKey ? await deriveFileKey(driveKey, this.id) : undefined,
-    );
-  }
-
-  async asDataItem(
-    bundler: ArweaveBundler,
-    itemAttributes: DataItemAttributes,
-    cipher?: Cipher,
-    driveKey?: CryptoKey,
-  ): Promise<DataItemJson> {
-    return await super.asDataItem(
-      bundler,
-      itemAttributes,
-      cipher,
-      driveKey ? await deriveFileKey(driveKey, this.id) : undefined,
-    );
   }
 }
 

@@ -70,13 +70,13 @@ export abstract class Entity<T extends Entity<T> = any> {
     arweave: Arweave,
     txAttributes: TransactionAttributes,
     cipher?: Cipher,
-    driveKey?: CryptoKey,
+    encryptionKey?: CryptoKey,
   ): Promise<Transaction> {
     const tx =
-      cipher && driveKey
+      cipher && encryptionKey
         ? await createEncryptedEntityTransaction(this, arweave, txAttributes, {
             name: cipher,
-            key: driveKey,
+            key: encryptionKey,
           })
         : await createUnencryptedEntityDataTransaction(
             this,
@@ -99,13 +99,13 @@ export abstract class Entity<T extends Entity<T> = any> {
     bundler: ArweaveBundler,
     itemAttributes: DataItemAttributes,
     cipher?: Cipher,
-    driveKey?: CryptoKey,
+    encryptionKey?: CryptoKey,
   ): Promise<DataItemJson> {
     const item =
-      cipher && driveKey
+      cipher && encryptionKey
         ? await createEncryptedEntityDataItem(this, bundler, itemAttributes, {
             name: cipher,
-            key: driveKey,
+            key: encryptionKey,
           })
         : await createUnencryptedEntityDataItem(this, bundler, itemAttributes);
 

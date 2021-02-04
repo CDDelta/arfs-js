@@ -1,5 +1,5 @@
 import { b64UrlToBuffer, b64UrlToString } from 'arweave/node/lib/utils';
-import { Cipher, FileEntity } from '../../src';
+import { Cipher, deriveFileKey, EntityTag, FileEntity } from '../../src';
 import {
   getArweaveBundler,
   getArweaveClient,
@@ -30,16 +30,20 @@ describe('FileEntity', () => {
       const tx = await arweave.transactions.get(
         'uhUfaoRRu6wTjW9cK0afmihE721smhCTXUdXG3BpnVU',
       );
+      const tagMap = tagListToMap(tx.tags);
+
+      const driveKey = await importAesGcmKey(
+        b64UrlToBuffer('eY6xT7D2St-rDW7V-mUyvzEREhOpt4innaEDtcWeZqU'),
+      );
+      const fileKey = await deriveFileKey(driveKey, tagMap[EntityTag.FileId]!);
 
       await expect(
         FileEntity.fromTransaction(
           tx.id,
           await arweave.wallets.ownerToAddress(tx.owner),
-          tagListToMap(tx.tags),
+          tagMap,
           tx.data,
-          await importAesGcmKey(
-            b64UrlToBuffer('eY6xT7D2St-rDW7V-mUyvzEREhOpt4innaEDtcWeZqU'),
-          ),
+          fileKey,
         ),
       ).resolves.toBeInstanceOf(FileEntity);
     });
@@ -93,6 +97,7 @@ describe('FileEntity', () => {
       test('can properly create private transaction', async () => {
         entity.createdAt = entity.lastModifiedDate = new Date();
         const testDriveKey = await importAesGcmKey(testDriveKeyBytes);
+        const testFileKey = await deriveFileKey(testDriveKey, entity.id);
 
         const tx = await entity.asTransaction(
           arweave,
@@ -100,7 +105,7 @@ describe('FileEntity', () => {
             owner: 'mock_owner',
           },
           Cipher.AES256GCM,
-          testDriveKey,
+          testFileKey,
         );
 
         await expect(
@@ -109,7 +114,7 @@ describe('FileEntity', () => {
             await arweave.wallets.ownerToAddress(tx.owner),
             tagListToMap(tx.tags),
             tx.data,
-            testDriveKey,
+            testFileKey,
           ),
         ).resolves.toMatchObject(entity);
       });
@@ -138,6 +143,7 @@ describe('FileEntity', () => {
       test('can properly create private data item', async () => {
         entity.createdAt = new Date();
         const testDriveKey = await importAesGcmKey(testDriveKeyBytes);
+        const testFileKey = await deriveFileKey(testDriveKey, entity.id);
 
         const item = await entity.asDataItem(
           bundler,
@@ -145,7 +151,7 @@ describe('FileEntity', () => {
             owner: 'mock_owner',
           },
           Cipher.AES256GCM,
-          testDriveKey,
+          testFileKey,
         );
 
         await expect(
@@ -154,7 +160,7 @@ describe('FileEntity', () => {
             await arweave.wallets.ownerToAddress(item.owner),
             tagListToMap(item.tags),
             b64UrlToBuffer(item.data),
-            testDriveKey,
+            testFileKey,
           ),
         ).resolves.toMatchObject(entity);
       });
