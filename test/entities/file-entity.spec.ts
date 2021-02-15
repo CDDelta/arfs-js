@@ -63,7 +63,7 @@ describe('FileEntity', () => {
       id: '225f09b7-84c0-495f-b4e6-1c775a6976d0',
       driveId: '225f09b7-84c0-495f-b4e6-1c775a6976d0',
       name: 'mock_file',
-      size: 12,
+      size: '12',
       parentFolderId: '225f09b7-84c0-495f-b4e6-1c775a6976d0',
       dataTxId: 'mock_tx_id',
       dataContentType: 'application/json',

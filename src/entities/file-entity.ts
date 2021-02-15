@@ -2,9 +2,8 @@ import { Exclude, plainToClass } from 'class-transformer';
 import {
   IsDate,
   IsNotEmpty,
-  IsNumber,
+  IsNumberString,
   IsOptional,
-  IsPositive,
   IsString,
   IsUUID,
   validateOrReject,
@@ -60,9 +59,8 @@ export class FileEntity
   name: string;
 
   /** The original size of the file before any encoding in bytes. */
-  @IsNumber()
-  @IsPositive()
-  size: number;
+  @IsNumberString()
+  size: string;
 
   @IsDate()
   lastModifiedDate: Date;
@@ -110,6 +108,8 @@ export class FileEntity
 
     const entity = plainToClass(FileEntity, {
       ...entityTxData,
+      // Explicitly stringify the size field for backwards compatability with entities that defined this as a number.
+      size: entityTxData.size.toString(),
       transactionId: txId,
       transactionOwnerAddress: txOwnerAddress,
       createdAt: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
@@ -138,7 +138,7 @@ export class FileEntity
 
 export interface FileEntityTransactionData {
   name: string;
-  size: number;
+  size: string;
   lastModifiedDate: Date;
   dataTxId: string;
   dataContentType?: string;
