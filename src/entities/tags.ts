@@ -15,6 +15,7 @@ export enum EntityTag {
 
   Cipher = 'Cipher',
   CipherIV = 'Cipher-IV',
+  CipherAuthTag = 'Cipher-Auth-Tag',
 
   ContentType = 'Content-Type',
 }

@@ -19,13 +19,29 @@ import {
 import { Cipher, EntityTagMap } from './tags';
 
 export abstract class Entity<T extends Entity<T> = any> {
-  /** The id of the transaction that represents this entity. */
+  /**
+   * The id of the transaction that represents this entity.
+   *
+   * Undefined when the entity is first created.
+   */
   @Exclude({ toPlainOnly: true })
-  transactionId: string;
+  transactionId?: string;
 
-  /** The address of the owner of the transaction that represents this entity. */
+  /**
+   * The address of the owner of the transaction that represents this entity.
+   *
+   * Undefined when the entity is first created.
+   */
   @Exclude({ toPlainOnly: true })
-  transactionOwnerAddress: string;
+  transactionOwnerAddress?: string;
+
+  /**
+   * The tags that exists on this transaction.
+   *
+   * Undefined when the entity is first created.
+   */
+  @Exclude({ toPlainOnly: true })
+  transactionTags: EntityTagMap;
 
   /**
    * The time at which this entity was created.

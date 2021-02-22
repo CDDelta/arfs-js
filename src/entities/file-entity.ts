@@ -112,6 +112,7 @@ export class FileEntity
       ...entityTxData,
       transactionId: txId,
       transactionOwnerAddress: txOwnerAddress,
+      transactionTags: txTags,
       createdAt: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
       id: txTags[EntityTag.FileId],
       driveId: txTags[EntityTag.DriveId],

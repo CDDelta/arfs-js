@@ -94,6 +94,7 @@ export class DriveEntity
       ...entityTxData,
       transactionId: txId,
       transactionOwnerAddress: txOwnerAddress,
+      transactionTags: txTags,
       createdAt: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
       id: txTags[EntityTag.DriveId],
       privacy: txTags[EntityTag.DrivePrivacy] || DrivePrivacy.Public,

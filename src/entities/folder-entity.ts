@@ -82,6 +82,7 @@ export class FolderEntity
       ...entityTxData,
       transactionId: txId,
       transactionOwnerAddress: txOwnerAddress,
+      transactionTags: txTags,
       createdAt: parseUnixTimeTagToDate(txTags[EntityTag.UnixTime]),
       id: txTags[EntityTag.FolderId],
       driveId: txTags[EntityTag.DriveId],
