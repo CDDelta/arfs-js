@@ -1,16 +1,16 @@
 import Arweave from 'arweave';
-import { DataItemJson } from 'arweave-bundles';
+import { DataItem, DataItemHeader } from 'arweave-stream-bundle';
 import { bufferTob64Url } from 'arweave/node/lib/utils';
 import { classToPlain } from 'class-transformer';
 import { randomBytes } from 'crypto';
+import { ReadableStream } from 'stream/web';
 import { Cipher, ContentType, Entity, EntityTagMap } from '../entities';
 import {
-  addTagsToDataItem,
+  addTagsToDataItemHeader,
   addTagsToTx,
-  ArweaveBundler,
   getSubtleCrypto,
   Transaction,
-  TransactionAttributes
+  TransactionAttributes,
 } from '../utils';
 
 let utf8Encoder: TextEncoder;
@@ -61,10 +61,9 @@ export async function createEncryptedTransaction(
  */
 export async function createEncryptedEntityDataItem(
   entity: Entity,
-  bundler: ArweaveBundler,
-  itemAttributes: TransactionAttributes,
+  dataItemProperties: Partial<DataItemHeader>,
   cipher: CipherParams,
-): Promise<DataItemJson> {
+): Promise<DataItem> {
   // Lazily create the TextEncoder.
   utf8Encoder ||= new TextEncoder();
 
@@ -72,19 +71,19 @@ export async function createEncryptedEntityDataItem(
 
   const res = await encryptDataForTransaction(encodedData, cipher);
 
-  const item = await bundler.createData(
-    {
-      ...itemAttributes,
-      data: new Uint8Array(res.data),
-    },
-    {
-      n: itemAttributes.owner,
-    } as any,
+  const header = new DataItemHeader(dataItemProperties);
+  addTagsToDataItemHeader(header, res.encryptionTags);
+
+  return new DataItem(
+    header,
+    new ReadableStream({
+      type: 'bytes',
+      start: (controller) => {
+        controller.enqueue(new Uint8Array(res.data));
+        controller.close();
+      },
+    }),
   );
-
-  addTagsToDataItem(item, res.encryptionTags, bundler);
-
-  return item;
 }
 
 export interface CipherParams {

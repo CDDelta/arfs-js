@@ -1,5 +1,3 @@
-import ArweaveBundles from 'arweave-bundles';
-
 /**
  * A minimal interface for ArFS transaction uses.
  */
@@ -19,18 +17,4 @@ export interface TransactionAttributes {
   target?: string;
   quantity?: string;
   reward?: string;
-}
-
-/**
- * A bundler for creating ANS-102 data bundles.
- */
-export interface ArweaveBundler extends ReturnType<typeof ArweaveBundles> {}
-
-/**
- * Attributes for a configuring a data item.
- */
-export interface DataItemAttributes {
-  owner: string;
-  target?: string;
-  nonce?: string;
 }

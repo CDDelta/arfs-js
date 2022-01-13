@@ -1,9 +1,12 @@
 import Arweave from 'arweave';
-import ArweaveBundles from 'arweave-bundles';
-import deepHash from 'arweave/node/lib/deepHash';
 import { b64UrlToString } from 'arweave/node/lib/utils';
+import { createHash } from 'crypto';
 import { EntityTagMap } from '../../src';
-import { ArweaveBundler, getSubtleCrypto } from '../../src/utils';
+import { getSubtleCrypto } from '../../src/utils';
+
+const arweave = getArweaveClient();
+
+export const MOCK_OWNER = createHash('sha256').update('MOCK_OWNER').digest();
 
 export function getArweaveClient(): Arweave {
   return Arweave.init({
@@ -13,12 +16,12 @@ export function getArweaveClient(): Arweave {
   });
 }
 
-export function getArweaveBundler(): ArweaveBundler {
-  return ArweaveBundles({
-    utils: Arweave.utils,
-    crypto: Arweave.crypto,
-    deepHash: deepHash,
-  });
+export async function rawOwnerBytesToB64UrlAddress(
+  owner: Uint8Array,
+): Promise<string> {
+  return await arweave.wallets.ownerToAddress(
+    Buffer.from(owner).toString('base64url'),
+  );
 }
 
 export function tagListToMap(

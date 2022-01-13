@@ -1,6 +1,6 @@
-import { DataItemJson } from 'arweave-bundles';
+import { DataItemHeader } from 'arweave-stream-bundle';
 import { EntityTagMap } from '../entities';
-import { ArweaveBundler, Transaction } from './interfaces';
+import { Transaction } from './interfaces';
 
 /**
  * Adds the provided map of tags to the provided transaction.
@@ -16,18 +16,17 @@ export function addTagsToTx(tx: Transaction, tags: EntityTagMap) {
 }
 
 /**
- * Adds the provided map of tags to the provided data item.
+ * Adds the provided map of tags to the provided data item header.
  *
  * Map entries that are `null` or `undefined` are ignored.
  */
-export function addTagsToDataItem(
-  item: DataItemJson,
+export function addTagsToDataItemHeader(
+  header: DataItemHeader,
   tags: EntityTagMap,
-  bundler: ArweaveBundler,
 ) {
   for (const [key, value] of Object.entries(tags)) {
     if (value != null) {
-      bundler.addTag(item, key, value);
+      header.addTag(key, value);
     }
   }
 }

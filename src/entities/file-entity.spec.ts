@@ -1,11 +1,12 @@
-import { b64UrlToBuffer, b64UrlToString } from 'arweave/node/lib/utils';
+import { b64UrlToBuffer } from 'arweave/node/lib/utils';
+import { buffer, text } from 'stream/consumers';
 import { Cipher, deriveFileKey, EntityTag, FileEntity } from '../../src';
 import {
-  getArweaveBundler,
   getArweaveClient,
   importAesGcmKey,
+  MOCK_OWNER,
   tagListToMap,
-} from '../utils';
+} from '../../test/utils';
 
 const arweave = getArweaveClient();
 
@@ -121,21 +122,21 @@ describe('FileEntity', () => {
     });
 
     describe('asDataItem()', () => {
-      const bundler = getArweaveBundler();
-
       test('can properly create public data item', async () => {
         entity.createdAt = new Date();
 
-        const item = await entity.asDataItem(bundler, {
-          owner: 'mock_owner',
+        const item = await entity.asDataItem({
+          owner: Buffer.from('mock_owner', 'base64url'),
         });
 
         await expect(
           FileEntity.fromTransaction(
-            item.id,
-            await arweave.wallets.ownerToAddress(item.owner),
-            tagListToMap(item.tags),
-            b64UrlToString(item.data),
+            item.header.id!,
+            await arweave.wallets.ownerToAddress(
+              Buffer.from(item.header.owner).toString('base64url'),
+            ),
+            tagListToMap(item.header.tags),
+            await text(item.data as any),
           ),
         ).resolves.toMatchObject(entity);
       });
@@ -146,9 +147,8 @@ describe('FileEntity', () => {
         const testFileKey = await deriveFileKey(testDriveKey, entity.id);
 
         const item = await entity.asDataItem(
-          bundler,
           {
-            owner: 'mock_owner',
+            owner: MOCK_OWNER,
           },
           Cipher.AES256GCM,
           testFileKey,
@@ -156,10 +156,12 @@ describe('FileEntity', () => {
 
         await expect(
           FileEntity.fromTransaction(
-            item.id,
-            await arweave.wallets.ownerToAddress(item.owner),
-            tagListToMap(item.tags),
-            b64UrlToBuffer(item.data),
+            item.header.id!,
+            await arweave.wallets.ownerToAddress(
+              Buffer.from(item.header.owner).toString('base64url'),
+            ),
+            tagListToMap(item.header.tags),
+            await buffer(item.data as any),
             testFileKey,
           ),
         ).resolves.toMatchObject(entity);

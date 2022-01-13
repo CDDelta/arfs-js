@@ -1,6 +1,7 @@
 {
   "name": "arfs",
-  "version": "0.7.0",
+  "version": "0.8.0",
+  "license": "MIT",
   "keywords": [
     "arweave",
     "typescript"
@@ -22,7 +23,7 @@
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-typescript": "^7.12.7",
     "@types/jest": "^26.0.19",
-    "@types/node": "^14.14.17",
+    "@types/node": "^16.11.11",
     "@types/uuid": "^8.3.0",
     "babel-jest": "^26.6.3",
     "jest": "^26.6.3",
@@ -31,7 +32,7 @@
   },
   "dependencies": {
     "arweave": "^1.10.0",
-    "arweave-bundles": "^1.0.0",
+    "arweave-stream-bundle": "^0.2.1",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "uuid": "^8.3.2"

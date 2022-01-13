@@ -1,4 +1,4 @@
-import { formatTxUnixTime } from '../../src/utils';
+import { formatTxUnixTime } from '.';
 
 describe('formatTxUnixTime()', () => {
   it('should return truncate timestamps decimals', () => {

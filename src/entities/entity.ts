@@ -1,5 +1,5 @@
 import Arweave from 'arweave';
-import { DataItemJson } from 'arweave-bundles';
+import { DataItem, DataItemHeader } from 'arweave-stream-bundle';
 import { Exclude } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
 import {
@@ -7,12 +7,10 @@ import {
   createEncryptedEntityTransaction,
 } from '../crypto';
 import {
-  addTagsToDataItem,
+  addTagsToDataItemHeader,
   addTagsToTx,
-  ArweaveBundler,
   createUnencryptedEntityDataItem,
   createUnencryptedEntityDataTransaction,
-  DataItemAttributes,
   Transaction,
   TransactionAttributes,
 } from '../utils';
@@ -112,21 +110,20 @@ export abstract class Entity<T extends Entity<T> = any> {
    * Optionally specify a cipher and encryption key to encrypt this entity's data.
    */
   async asDataItem(
-    bundler: ArweaveBundler,
-    itemAttributes: DataItemAttributes,
+    dataItemProperties: Partial<DataItemHeader>,
     cipher?: Cipher,
     encryptionKey?: CryptoKey,
-  ): Promise<DataItemJson> {
-    const item =
+  ): Promise<DataItem> {
+    const dataItem =
       cipher && encryptionKey
-        ? await createEncryptedEntityDataItem(this, bundler, itemAttributes, {
+        ? await createEncryptedEntityDataItem(this, dataItemProperties, {
             name: cipher,
             key: encryptionKey,
           })
-        : await createUnencryptedEntityDataItem(this, bundler, itemAttributes);
+        : await createUnencryptedEntityDataItem(this, dataItemProperties);
 
-    addTagsToDataItem(item, this.getEntityTransactionTags(), bundler);
+    addTagsToDataItemHeader(dataItem.header, this.getEntityTransactionTags());
 
-    return item;
+    return dataItem;
   }
 }

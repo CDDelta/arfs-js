@@ -1,11 +1,13 @@
-import { b64UrlToBuffer, b64UrlToString } from 'arweave/node/lib/utils';
+import { b64UrlToBuffer } from 'arweave/node/lib/utils';
+import { buffer, text } from 'stream/consumers';
 import { Cipher, FolderEntity } from '../../src';
 import {
-  getArweaveBundler,
   getArweaveClient,
   importAesGcmKey,
+  MOCK_OWNER,
+  rawOwnerBytesToB64UrlAddress,
   tagListToMap,
-} from '../utils';
+} from '../../test/utils';
 
 const arweave = getArweaveClient();
 
@@ -112,21 +114,19 @@ describe('FolderEntity', () => {
     });
 
     describe('asDataItem()', () => {
-      const bundler = getArweaveBundler();
-
       test('can properly create public data item', async () => {
         entity.createdAt = new Date();
 
-        const item = await entity.asDataItem(bundler, {
-          owner: 'mock_owner',
+        const item = await entity.asDataItem({
+          owner: MOCK_OWNER,
         });
 
         await expect(
           FolderEntity.fromTransaction(
-            item.id,
-            await arweave.wallets.ownerToAddress(item.owner),
-            tagListToMap(item.tags),
-            b64UrlToString(item.data),
+            item.header.id!,
+            await rawOwnerBytesToB64UrlAddress(item.header.owner),
+            tagListToMap(item.header.tags),
+            await text(item.data as any),
           ),
         ).resolves.toMatchObject(entity);
       });
@@ -136,9 +136,8 @@ describe('FolderEntity', () => {
         const testDriveKey = await importAesGcmKey(testDriveKeyBytes);
 
         const item = await entity.asDataItem(
-          bundler,
           {
-            owner: 'mock_owner',
+            owner: MOCK_OWNER,
           },
           Cipher.AES256GCM,
           testDriveKey,
@@ -146,10 +145,10 @@ describe('FolderEntity', () => {
 
         await expect(
           FolderEntity.fromTransaction(
-            item.id,
-            await arweave.wallets.ownerToAddress(item.owner),
-            tagListToMap(item.tags),
-            b64UrlToBuffer(item.data),
+            item.header.id!,
+            await rawOwnerBytesToB64UrlAddress(item.header.owner),
+            tagListToMap(item.header.tags),
+            await buffer(item.data as any),
             testDriveKey,
           ),
         ).resolves.toMatchObject(entity);
