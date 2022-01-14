@@ -45,7 +45,7 @@ export async function createUnencryptedEntityDataItem(
 
   return new DataItem(
     header,
-    new ReadableStream({
+    () => new ReadableStream({
       type: 'bytes',
       start: (controller) => {
         const entityJson = JSON.stringify(classToPlain(entity));

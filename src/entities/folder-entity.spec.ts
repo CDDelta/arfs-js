@@ -6,7 +6,7 @@ import {
   importAesGcmKey,
   MOCK_OWNER,
   rawOwnerBytesToB64UrlAddress,
-  tagListToMap,
+  tagListToMap
 } from '../../test/utils';
 
 const arweave = getArweaveClient();
@@ -126,7 +126,7 @@ describe('FolderEntity', () => {
             item.header.id!,
             await rawOwnerBytesToB64UrlAddress(item.header.owner),
             tagListToMap(item.header.tags),
-            await text(item.data as any),
+            await text(item.dataStreamer() as any),
           ),
         ).resolves.toMatchObject(entity);
       });
@@ -148,7 +148,7 @@ describe('FolderEntity', () => {
             item.header.id!,
             await rawOwnerBytesToB64UrlAddress(item.header.owner),
             tagListToMap(item.header.tags),
-            await buffer(item.data as any),
+            await buffer(item.dataStreamer() as any),
             testDriveKey,
           ),
         ).resolves.toMatchObject(entity);

@@ -10,7 +10,7 @@ import {
   addTagsToTx,
   getSubtleCrypto,
   Transaction,
-  TransactionAttributes,
+  TransactionAttributes
 } from '../utils';
 
 let utf8Encoder: TextEncoder;
@@ -76,7 +76,7 @@ export async function createEncryptedEntityDataItem(
 
   return new DataItem(
     header,
-    new ReadableStream({
+    () => new ReadableStream({
       type: 'bytes',
       start: (controller) => {
         controller.enqueue(new Uint8Array(res.data));

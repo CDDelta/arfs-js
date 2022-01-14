@@ -5,7 +5,7 @@ import {
   getArweaveClient,
   importAesGcmKey,
   MOCK_OWNER,
-  tagListToMap,
+  tagListToMap
 } from '../../test/utils';
 
 const arweave = getArweaveClient();
@@ -136,7 +136,7 @@ describe('FileEntity', () => {
               Buffer.from(item.header.owner).toString('base64url'),
             ),
             tagListToMap(item.header.tags),
-            await text(item.data as any),
+            await text(item.dataStreamer() as any),
           ),
         ).resolves.toMatchObject(entity);
       });
@@ -161,7 +161,7 @@ describe('FileEntity', () => {
               Buffer.from(item.header.owner).toString('base64url'),
             ),
             tagListToMap(item.header.tags),
-            await buffer(item.data as any),
+            await buffer(item.dataStreamer() as any),
             testFileKey,
           ),
         ).resolves.toMatchObject(entity);
