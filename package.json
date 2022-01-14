@@ -1,6 +1,6 @@
 {
   "name": "arfs",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "license": "MIT",
   "keywords": [
     "arweave",
@@ -32,9 +32,11 @@
   },
   "dependencies": {
     "arweave": "^1.10.0",
-    "arweave-stream-bundle": "^0.2.1",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "uuid": "^8.3.2"
+  },
+  "peerDependencies": {
+    "arweave-stream-bundle": "^0.2.2"
   }
 }
