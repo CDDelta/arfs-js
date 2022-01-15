@@ -1,3 +1,4 @@
+import { SignatureType } from 'arweave-stream-bundle';
 import { b64UrlToBuffer } from 'arweave/node/lib/utils';
 import { buffer, text } from 'stream/consumers';
 import { Cipher, deriveFileKey, EntityTag, FileEntity } from '../../src';
@@ -129,6 +130,9 @@ describe('FileEntity', () => {
           owner: Buffer.from('mock_owner', 'base64url'),
         });
 
+        const jwk = await import('../../test/fixtures/test-key.json');
+        await item.header.sign(SignatureType.PS256_65537, jwk, item.dataStreamer());
+
         await expect(
           FileEntity.fromTransaction(
             item.header.id!,
@@ -153,6 +157,9 @@ describe('FileEntity', () => {
           Cipher.AES256GCM,
           testFileKey,
         );
+
+        const jwk = await import('../../test/fixtures/test-key.json');
+        await item.header.sign(SignatureType.PS256_65537, jwk, item.dataStreamer());
 
         await expect(
           FileEntity.fromTransaction(

@@ -1,3 +1,4 @@
+import { SignatureType } from 'arweave-stream-bundle';
 import { b64UrlToBuffer } from 'arweave/node/lib/utils';
 import { buffer, text } from 'stream/consumers';
 import { Cipher, FolderEntity } from '../../src';
@@ -121,6 +122,9 @@ describe('FolderEntity', () => {
           owner: MOCK_OWNER,
         });
 
+        const jwk = await import('../../test/fixtures/test-key.json');
+        await item.header.sign(SignatureType.PS256_65537, jwk, item.dataStreamer());
+
         await expect(
           FolderEntity.fromTransaction(
             item.header.id!,
@@ -142,6 +146,9 @@ describe('FolderEntity', () => {
           Cipher.AES256GCM,
           testDriveKey,
         );
+
+        const jwk = await import('../../test/fixtures/test-key.json');
+        await item.header.sign(SignatureType.PS256_65537, jwk, item.dataStreamer());
 
         await expect(
           FolderEntity.fromTransaction(

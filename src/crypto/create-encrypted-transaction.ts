@@ -92,7 +92,7 @@ export interface CipherParams {
 }
 
 interface TransactionEncryptionResult {
-  data: ArrayBuffer;
+  data: Uint8Array;
   encryptionTags: EntityTagMap;
 }
 
@@ -134,7 +134,7 @@ async function encryptDataForTransaction(
   tags['Content-Type'] = ContentType.OctetStream;
 
   return {
-    data: encryptedData,
+    data: new Uint8Array(encryptedData),
     encryptionTags: tags,
   };
 }
