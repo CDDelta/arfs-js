@@ -3,10 +3,11 @@ import { b64UrlToBuffer } from 'arweave/node/lib/utils';
 import { buffer, text } from 'stream/consumers';
 import { Cipher, deriveFileKey, EntityTag, FileEntity } from '../../src';
 import {
-  getArweaveClient,
-  importAesGcmKey,
-  MOCK_OWNER,
-  tagListToMap
+  dataItemTagListToMap,
+    getArweaveClient,
+    importAesGcmKey,
+    MOCK_OWNER,
+    txTagListToMap
 } from '../../test/utils';
 
 const arweave = getArweaveClient();
@@ -22,7 +23,7 @@ describe('FileEntity', () => {
         FileEntity.fromTransaction(
           tx.id,
           await arweave.wallets.ownerToAddress(tx.owner),
-          tagListToMap(tx.tags),
+          txTagListToMap(tx.tags),
           tx.data,
         ),
       ).resolves.toBeInstanceOf(FileEntity);
@@ -32,7 +33,7 @@ describe('FileEntity', () => {
       const tx = await arweave.transactions.get(
         'uhUfaoRRu6wTjW9cK0afmihE721smhCTXUdXG3BpnVU',
       );
-      const tagMap = tagListToMap(tx.tags);
+      const tagMap = txTagListToMap(tx.tags);
 
       const driveKey = await importAesGcmKey(
         b64UrlToBuffer('eY6xT7D2St-rDW7V-mUyvzEREhOpt4innaEDtcWeZqU'),
@@ -90,7 +91,7 @@ describe('FileEntity', () => {
           FileEntity.fromTransaction(
             tx.id,
             await arweave.wallets.ownerToAddress(tx.owner),
-            tagListToMap(tx.tags),
+            txTagListToMap(tx.tags),
             tx.data,
           ),
         ).resolves.toMatchObject(entity);
@@ -114,7 +115,7 @@ describe('FileEntity', () => {
           FileEntity.fromTransaction(
             tx.id,
             await arweave.wallets.ownerToAddress(tx.owner),
-            tagListToMap(tx.tags),
+            txTagListToMap(tx.tags),
             tx.data,
             testFileKey,
           ),
@@ -139,7 +140,7 @@ describe('FileEntity', () => {
             await arweave.wallets.ownerToAddress(
               Buffer.from(item.header.owner).toString('base64url'),
             ),
-            tagListToMap(item.header.tags),
+            dataItemTagListToMap(item.header.tags),
             await text(item.dataStreamer() as any),
           ),
         ).resolves.toMatchObject(entity);
@@ -167,7 +168,7 @@ describe('FileEntity', () => {
             await arweave.wallets.ownerToAddress(
               Buffer.from(item.header.owner).toString('base64url'),
             ),
-            tagListToMap(item.header.tags),
+            dataItemTagListToMap(item.header.tags),
             await buffer(item.dataStreamer() as any),
             testFileKey,
           ),
