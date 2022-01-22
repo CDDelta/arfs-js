@@ -3,12 +3,11 @@ import { b64UrlToBuffer } from 'arweave/node/lib/utils';
 import { buffer, text } from 'stream/consumers';
 import { Cipher, DriveEntity, DrivePrivacy } from '..';
 import {
-  dataItemTagListToMap,
   getArweaveClient,
   importAesGcmKey,
   MOCK_OWNER,
   rawOwnerBytesToB64UrlAddress,
-  txTagListToMap
+  tagListToMap
 } from '../../test/utils';
 
 const arweave = getArweaveClient();
@@ -24,7 +23,7 @@ describe('DriveEntity', () => {
         DriveEntity.fromTransaction(
           tx.id,
           await arweave.wallets.ownerToAddress(tx.owner),
-          txTagListToMap(tx.tags),
+          tagListToMap(tx.tags),
           tx.data,
         ),
       ).resolves.toBeInstanceOf(DriveEntity);
@@ -39,7 +38,7 @@ describe('DriveEntity', () => {
         DriveEntity.fromTransaction(
           tx.id,
           await arweave.wallets.ownerToAddress(tx.owner),
-          txTagListToMap(tx.tags),
+          tagListToMap(tx.tags),
           tx.data,
           await importAesGcmKey(
             b64UrlToBuffer('K7jsNncKDgDBi_1xnNi9tigst4jQKeaBxrb0GAZMRYA'),
@@ -56,7 +55,7 @@ describe('DriveEntity', () => {
       const entity = await DriveEntity.fromTransaction(
         tx.id,
         await arweave.wallets.ownerToAddress(tx.owner),
-        txTagListToMap(tx.tags),
+        tagListToMap(tx.tags),
         tx.data,
       );
 
@@ -64,7 +63,7 @@ describe('DriveEntity', () => {
     });
   });
 
-  describe('creation', () => {
+  describe('creation', async () => {
     beforeAll(() => {
       jest.useFakeTimers('modern');
       jest.setSystemTime(new Date('20 Aug 2020 00:12:00 GMT').getTime());
@@ -100,7 +99,7 @@ describe('DriveEntity', () => {
           DriveEntity.fromTransaction(
             tx.id,
             await arweave.wallets.ownerToAddress(tx.owner),
-            txTagListToMap(tx.tags),
+            tagListToMap(tx.tags),
             tx.data,
           ),
         ).resolves.toMatchObject(entity);
@@ -123,7 +122,7 @@ describe('DriveEntity', () => {
           DriveEntity.fromTransaction(
             tx.id,
             await arweave.wallets.ownerToAddress(tx.owner),
-            txTagListToMap(tx.tags),
+            tagListToMap(tx.tags),
             tx.data,
             testDriveKey,
           ),
@@ -146,7 +145,7 @@ describe('DriveEntity', () => {
           DriveEntity.fromTransaction(
             item.header.id!,
             await rawOwnerBytesToB64UrlAddress(item.header.owner),
-            dataItemTagListToMap(item.header.tags),
+            tagListToMap(item.header.tags),
             await text(item.dataStreamer() as any),
           ),
         ).resolves.toMatchObject(entity);
@@ -171,7 +170,7 @@ describe('DriveEntity', () => {
           DriveEntity.fromTransaction(
             item.header.id!,
             await rawOwnerBytesToB64UrlAddress(item.header.owner),
-            dataItemTagListToMap(item.header.tags),
+            tagListToMap(item.header.tags),
             await buffer(item.dataStreamer() as any),
             testDriveKey,
           ),

@@ -1,22 +1,27 @@
-import { Exclude, plainToClass, Transform, TransformationType } from 'class-transformer';
+import { Exclude, plainToClass } from 'class-transformer';
 import {
   IsDate,
-  IsNotEmpty, IsOptional, IsString,
-  IsUUID, validateOrReject
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  IsUUID,
+  validateOrReject,
 } from 'class-validator';
 import { decryptEntityTransactionData } from '../crypto';
 import {
   arfsVersion,
   coerceToUtf8,
   formatTxUnixTime,
-  parseUnixTimeTagToDate
+  parseUnixTimeTagToDate,
 } from '../utils';
 import { Entity } from './entity';
 import { EntityTag, EntityTagMap, EntityType } from './tags';
 
 export class FileEntity
   extends Entity<FileEntity>
-  implements Omit<FileEntityTransactionData, 'size'> {
+  implements FileEntityTransactionData {
   /**
    * The unique, persistent id of this file.
    *
@@ -55,23 +60,9 @@ export class FileEntity
   name: string;
 
   /** The original size of the file before any encoding in bytes. */
-  @Transform(({ type, value }) => {
-    switch (type) {
-      case TransformationType.PLAIN_TO_CLASS:
-        if (typeof value === 'string' || typeof value === 'number') {
-          return BigInt(value);
-        } else if (typeof value === 'bigint') {
-          return value;
-        }
-      case TransformationType.CLASS_TO_PLAIN:
-        if (typeof value === 'number' || typeof value === 'bigint') {
-          return value.toString();
-        }
-      default:
-        throw Error(`Object value could not be transformed ${type}: ${value}`);
-    }
-  })
-  size: bigint;
+  @IsNumber()
+  @IsPositive()
+  size: number;
 
   @IsDate()
   lastModifiedDate: Date;
@@ -148,7 +139,7 @@ export class FileEntity
 
 export interface FileEntityTransactionData {
   name: string;
-  size: number | string;
+  size: number;
   lastModifiedDate: Date;
   dataTxId: string;
   dataContentType?: string;

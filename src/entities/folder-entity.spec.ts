@@ -3,12 +3,11 @@ import { b64UrlToBuffer } from 'arweave/node/lib/utils';
 import { buffer, text } from 'stream/consumers';
 import { Cipher, FolderEntity } from '../../src';
 import {
-  dataItemTagListToMap,
   getArweaveClient,
   importAesGcmKey,
   MOCK_OWNER,
   rawOwnerBytesToB64UrlAddress,
-  txTagListToMap
+  tagListToMap
 } from '../../test/utils';
 
 const arweave = getArweaveClient();
@@ -24,7 +23,7 @@ describe('FolderEntity', () => {
         FolderEntity.fromTransaction(
           tx.id,
           await arweave.wallets.ownerToAddress(tx.owner),
-          txTagListToMap(tx.tags),
+          tagListToMap(tx.tags),
           tx.data,
         ),
       ).resolves.toBeInstanceOf(FolderEntity);
@@ -39,7 +38,7 @@ describe('FolderEntity', () => {
         FolderEntity.fromTransaction(
           tx.id,
           await arweave.wallets.ownerToAddress(tx.owner),
-          txTagListToMap(tx.tags),
+          tagListToMap(tx.tags),
           tx.data,
           await importAesGcmKey(
             b64UrlToBuffer('K7jsNncKDgDBi_1xnNi9tigst4jQKeaBxrb0GAZMRYA'),
@@ -84,7 +83,7 @@ describe('FolderEntity', () => {
           FolderEntity.fromTransaction(
             tx.id,
             await arweave.wallets.ownerToAddress(tx.owner),
-            txTagListToMap(tx.tags),
+            tagListToMap(tx.tags),
             tx.data,
           ),
         ).resolves.toMatchObject(entity);
@@ -107,7 +106,7 @@ describe('FolderEntity', () => {
           FolderEntity.fromTransaction(
             tx.id,
             await arweave.wallets.ownerToAddress(tx.owner),
-            txTagListToMap(tx.tags),
+            tagListToMap(tx.tags),
             tx.data,
             testDriveKey,
           ),
@@ -130,7 +129,7 @@ describe('FolderEntity', () => {
           FolderEntity.fromTransaction(
             item.header.id!,
             await rawOwnerBytesToB64UrlAddress(item.header.owner),
-            dataItemTagListToMap(item.header.tags),
+            tagListToMap(item.header.tags),
             await text(item.dataStreamer() as any),
           ),
         ).resolves.toMatchObject(entity);
@@ -155,7 +154,7 @@ describe('FolderEntity', () => {
           FolderEntity.fromTransaction(
             item.header.id!,
             await rawOwnerBytesToB64UrlAddress(item.header.owner),
-            dataItemTagListToMap(item.header.tags),
+            tagListToMap(item.header.tags),
             await buffer(item.dataStreamer() as any),
             testDriveKey,
           ),

@@ -24,20 +24,11 @@ export async function rawOwnerBytesToB64UrlAddress(
   );
 }
 
-export function txTagListToMap(
+export function tagListToMap(
   tags: { name: string; value: string }[],
 ): EntityTagMap {
   return tags.reduce((map, tag) => {
     map[b64UrlToString(tag.name)] = b64UrlToString(tag.value);
-    return map;
-  }, {});
-}
-
-export function dataItemTagListToMap(
-  tags: { name: string; value: string }[],
-): EntityTagMap {
-  return tags.reduce((map, tag) => {
-    map[tag.name] = tag.value;
     return map;
   }, {});
 }
